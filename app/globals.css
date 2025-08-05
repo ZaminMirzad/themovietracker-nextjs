@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ebeaea;
+  --foreground: #6d6d6d;
 }
 
 @theme inline {
@@ -12,10 +12,40 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --light-background: #ebeaea;
+  --light-foreground: #6d6d6d;
+
+  --color-light-background: #ebeaea;
+  --color-light-foreground: #6d6d6d;
+
+  --color-light-input-background: #ffffff;
+  --color-light-input-border: #cccccc;
+  --color-light-input-text: #000000;
+  --color-light-input-placeholder: #999999;
+
+  --color-light-border: #d1d1d1;
+  --color-light-accent: #007bff;
+  --color-light-hover: #fcf4ff;
+
+  /* dark mode colors */
+  --color-dark-background: #1c1c1c;
+  --color-dark-foreground: #c7c7c7;
+
+  --color-dark-input-background: #2a2a2a;
+  --color-dark-input-border: #444444;
+  --color-dark-input-text: #f1f1f1;
+  --color-dark-input-placeholder: #888888;
+
+  --color-dark-border: #333333;
+  --color-dark-accent: #4f8cff;
+  --color-dark-hover: #2a004a;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1c1c1c;
+    --foreground: #c7c7c7;
   }
 }
 
