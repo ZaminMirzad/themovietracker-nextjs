@@ -173,12 +173,12 @@ export default function TVShowPage() {
         </div>
         
         <div className="flex flex-col lg:flex-row gap-8 mb-8">
-          <div className="w-full lg:w-1/3 flex-1/5">
+          <div className="w-full lg:w-1/3 flex-1/5 h-[350px]">
             <Image
               src={`https://image.tmdb.org/t/p/w500${tvShow?.poster_path}`}
               alt={tvShow?.name || "TV Show poster"}
               width={110}
-              height={200}
+              height={350}
               className="rounded-xl w-full object-cover"
             />
           </div>
@@ -216,7 +216,7 @@ export default function TVShowPage() {
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
               {isPlayingTrailer && selectedTrailer ? (
-                <div className="relative w-full h-[250px] rounded-xl overflow-hidden">
+                <div className="relative w-full h-[350px] rounded-xl overflow-hidden">
                   <iframe
                     src={`https://www.youtube.com/embed/${selectedTrailer}?autoplay=1&rel=0`}
                     title="Trailer"
@@ -232,7 +232,7 @@ export default function TVShowPage() {
                   </button>
                 </div>
               ) : (
-                <div className="relative w-full h-[250px]">
+                <div className="relative w-full h-[350px]">
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${tvShow?.backdrop_path}`}
                     alt="TV Show Backdrop"

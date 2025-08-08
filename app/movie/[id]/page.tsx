@@ -58,6 +58,13 @@ export default function MoviePage() {
     vote_average?: number;
     release_date?: string;
   };
+
+  type Trailer = {
+    key: string;
+    name: string;
+    site: string;
+    type: string;
+  };
   
   const [movie, setMovie] = useState<Movie | null>(null);
   const [cast, setCast] = useState<Cast[]>([]);
@@ -67,11 +74,14 @@ export default function MoviePage() {
   const [showCastModal, setShowCastModal] = useState(false);
   const [selectedCrew, setSelectedCrew] = useState<Crew | null>(null);
   const [showCrewModal, setShowCrewModal] = useState(false);
+  const [trailers, setTrailers] = useState<Trailer[]>([]);
+  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
+  const [selectedTrailer, setSelectedTrailer] = useState<string>("");
 
   useEffect(() => {
     async function fetchMovie() {
       try {
-        const [movieRes, creditsRes, relatedRes] = await Promise.all([
+        const [movieRes, creditsRes, relatedRes, trailersRes] = await Promise.all([
           fetch(
             `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
           ),
@@ -81,18 +91,31 @@ export default function MoviePage() {
           fetch(
             `https://api.themoviedb.org/3/movie/${id}/similar?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
           ),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ),
         ]);
 
-        const [movieData, creditsData, relatedData] = await Promise.all([
+        const [movieData, creditsData, relatedData, trailersData] = await Promise.all([
           movieRes.json(),
           creditsRes.json(),
           relatedRes.json(),
+          trailersRes.json(),
         ]);
 
         setMovie(movieData);
         setCast(creditsData.cast?.slice(0, 10) || []);
         setCrew(creditsData.crew?.slice(0, 8) || []);
         setRelatedMovies(relatedData.results?.slice(0, 12) || []);
+        
+        // Set trailers
+        const officialTrailers = trailersData.results?.filter(
+          (trailer: Trailer) => trailer.type === "Trailer" && trailer.site === "YouTube"
+        ) || [];
+        setTrailers(officialTrailers);
+        if (officialTrailers.length > 0) {
+          setSelectedTrailer(officialTrailers[0].key);
+        }
       } catch (error) {
         console.error("Error fetching movie:", error);
       }
@@ -141,6 +164,16 @@ export default function MoviePage() {
     setShowCrewModal(true);
   };
 
+  const handlePlayTrailer = () => {
+    if (trailers.length > 0) {
+      setIsPlayingTrailer(true);
+    }
+  };
+
+  const handlePauseTrailer = () => {
+    setIsPlayingTrailer(false);
+  };
+
   function handleClick(id: string | number) {
     router.push(`/movie/${id}`);
   }
@@ -174,12 +207,12 @@ export default function MoviePage() {
         </div>
         
         <div className="flex flex-col lg:flex-row gap-8 mb-8">
-          <div className="w-full lg:w-1/3 flex-1/5">
+          <div className="w-full lg:w-1/3 flex-1/5 h-[350px]">
             <Image
               src={`https://image.tmdb.org/t/p/w500${movie?.poster_path}`}
               alt={movie?.title || "Movie poster"}
               width={110}
-              height={200}
+              height={350}
               className="rounded-xl w-full object-cover"
             />
           </div>
@@ -219,18 +252,54 @@ export default function MoviePage() {
           
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${movie?.backdrop_path}`}
-                alt="Movie Backdrop"
-                width={600}
-                height={250}
-                className="rounded-xl object-cover w-full h-full"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                <p className="text-white text-sm line-clamp-3">
-                  {movie?.overview || "Loading movie description..."}
-                </p>
-              </div>
+              {isPlayingTrailer && selectedTrailer ? (
+                <div className="relative w-full h-[350px] rounded-xl overflow-hidden">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${selectedTrailer}?autoplay=1&rel=0`}
+                    title="Trailer"
+                    className="w-full h-full rounded-xl"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                  <button
+                    onClick={handlePauseTrailer}
+                    className="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-90 transition-colors z-10"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div className="relative w-full h-[350px]">
+                  <Image
+                    src={`https://image.tmdb.org/t/p/w500${movie?.backdrop_path}`}
+                    alt="Movie Backdrop"
+                    width={600}
+                    height={250}
+                    className="rounded-xl object-cover w-full h-full"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <p className="text-white text-sm line-clamp-3">
+                      {movie?.overview || "Loading movie description..."}
+                    </p>
+                  </div>
+                  {trailers.length > 0 && (
+                    <button
+                      onClick={handlePlayTrailer}
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
+                    >
+                      <div className="bg-white bg-opacity-90 p-4 rounded-full group-hover:scale-110 transition-transform">
+                        <svg 
+                          className="w-8 h-8 text-black ml-1" 
+                          fill="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
