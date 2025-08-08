@@ -2,12 +2,12 @@ export default function FilteringTabs({
   setActiveTab,
   activeTab,
 }: {
-  setActiveTab: (tab: "all" | "currently" | "suggested" | "previously") => void;
+  setActiveTab: (tab: "all" | "currently" | "suggested" | "previously" | "tv") => void;
   activeTab: string;
 }) {
   return (
     <div className="mb-8">
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-4 flex-wrap">
         <TabButton
           label="All"
           isActive={activeTab === "all"}
@@ -27,6 +27,11 @@ export default function FilteringTabs({
           label="Previously Watched"
           isActive={activeTab === "previously"}
           onClick={() => setActiveTab("previously")}
+        />
+        <TabButton
+          label="TV Shows"
+          isActive={activeTab === "tv"}
+          onClick={() => setActiveTab("tv")}
         />
       </div>
     </div>

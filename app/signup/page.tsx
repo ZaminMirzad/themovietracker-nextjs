@@ -24,13 +24,8 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="h-full  min-h-screen flex flex-col justify-center items-center">
+    <main className="h-full min-h-screen flex flex-col justify-center items-center">
       <div className="flex flex-col items-center justify-center h-full flex-9/12">
-        <Link href={"/"} className="text-5xl font-bold self-start">
-          The <br />
-          Movie <br /> Tracker
-        </Link>
-
         <form
           className="flex flex-col space-y-4 w-2xs mt-4"
           autoComplete="off"

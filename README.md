@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Movie Tracker
 
-## Getting Started
+A Next.js application for tracking movies and TV shows with a global search functionality.
 
-First, run the development server:
+## Features
 
+- **Global Header**: Search input is available on all pages through a shared header component
+- **Zustand Store**: Centralized state management for search functionality and app configuration
+- **Search Functionality**: Real-time search with debouncing and modal results
+- **Responsive Design**: Works on desktop and mobile devices
+- **Dark Mode Support**: Built-in dark mode styling
+
+## Architecture
+
+### Global Header
+The header component (`components/header.tsx`) is included in the root layout (`app/layout.tsx`) and provides:
+- Search input with real-time search
+- Clear search functionality
+- Focus/blur handling
+- Integration with Zustand store
+
+### Zustand Store
+The store (`store/useStore.ts`) manages:
+- Search state (query, results, loading)
+- Modal visibility
+- Input focus state
+- Default page configuration
+- Search handlers with debouncing
+
+### Search Flow
+1. User types in the search input
+2. Input is debounced (400ms delay)
+3. API call is made to TMDB
+4. Results are stored in Zustand store
+5. Modal shows filtered results
+6. User can click on results to navigate
+
+## Pages
+
+- **Home** (`/`): Main dashboard with trending movies and filtering tabs
+- **Movie Details** (`/movie/[id]`): Individual movie/show details
+- **Profile** (`/profile`): User profile page
+- **Login** (`/login`): Authentication page
+- **Signup** (`/signup`): Registration page
+
+## Setup
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Set up environment variables:
+```env
+NEXT_PUBLIC_API_KEY=your_tmdb_api_key
+NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
+NEXT_PUBLIC_IMAGE_BASE_URL=https://image.tmdb.org/t/p/w500
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Store Configuration
 
-## Learn More
+The Zustand store can be configured to set default pages and other app-wide settings:
 
-To learn more about Next.js, take a look at the following resources:
+```typescript
+import { useAppStore } from '@/store/useStore';
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+const { setDefaultPage, defaultPage } = useAppStore();
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+// Set default page
+setDefaultPage('/movie/123');
 
-## Deploy on Vercel
+// Navigate to default page
+navigateToDefault();
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Search Functionality
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The search is handled entirely through the Zustand store:
+- Debounced API calls (400ms)
+- Error handling
+- Loading states
+- Result filtering
+- Modal management
+
+Built with ❤️ by Zamin Mirzad

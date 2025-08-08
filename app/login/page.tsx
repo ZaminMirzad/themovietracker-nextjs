@@ -22,13 +22,8 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="h-full  min-h-screen flex flex-col justify-center items-center">
+    <main className="h-full min-h-screen flex flex-col justify-center items-center">
       <div className="flex flex-col items-center justify-center h-full flex-9/12">
-        <Link href={"/"} className="text-5xl font-bold self-start">
-          The <br />
-          Movie <br /> Tracker
-        </Link>
-
         <form className="flex flex-col space-y-4 w-2xs mt-4" autoComplete="off">
           <input
             className="border border-gray-300 dark:border-[#444444] px-3 py-1.5 pt-2  rounded-xl bg-[#D9D9D9] dark:bg-[#1e1e1e] focus:outline-none focus:ring-2 focus:ring-[#65656590] dark:text-[#d5d3d3]"
