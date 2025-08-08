@@ -1,7 +1,6 @@
-import { RefObject, createRef } from "react";
 import { create } from "zustand";
+import { RefObject } from "react";
 
-// Define the shape of a search result
 interface ISearchResult {
   id: string | number;
   backdrop_path?: string;
@@ -11,7 +10,15 @@ interface ISearchResult {
   media_type?: string;
 }
 
-// Define the shape of the application state
+interface IBookmark {
+  id: string | number;
+  title: string;
+  poster_path?: string;
+  backdrop_path?: string;
+  media_type: 'movie' | 'tv';
+  added_at: string;
+}
+
 interface IAppState {
   // Search functionality
   search: string;
@@ -26,20 +33,26 @@ interface IAppState {
   setIsSearching: (val: boolean) => void;
   inputRef: RefObject<HTMLInputElement | null>;
   setInputRef: (ref: RefObject<HTMLInputElement | null>) => void;
-  
+
   // Default page configuration
   defaultPage: string;
   setDefaultPage: (page: string) => void;
-  
+
+  // Bookmarks
+  bookmarks: IBookmark[];
+  addBookmark: (bookmark: IBookmark) => void;
+  removeBookmark: (id: string | number, mediaType: 'movie' | 'tv') => void;
+  isBookmarked: (id: string | number, mediaType: 'movie' | 'tv') => boolean;
+  setBookmarks: (bookmarks: IBookmark[]) => void;
+
   // Search handlers
   handleSearch: (query: string) => Promise<void>;
   clearSearch: () => void;
-  
-  // Navigation helpers
+
+  // Navigation helper
   navigateToDefault: () => void;
 }
 
-// Create a Zustand store for the application state
 export const useAppStore = create<IAppState>((set, get) => ({
   // Search state
   search: "",
@@ -52,21 +65,52 @@ export const useAppStore = create<IAppState>((set, get) => ({
   setSearchResults: (results) => set({ searchResults: results }),
   isSearching: false,
   setIsSearching: (val) => set({ isSearching: val }),
-  inputRef: typeof window !== "undefined" ? createRef<HTMLInputElement>() : { current: null },
+  inputRef: { current: null },
   setInputRef: (ref) => set({ inputRef: ref }),
-  
+
   // Default page configuration
   defaultPage: "/",
   setDefaultPage: (page) => set({ defaultPage: page }),
-  
-  // Search handlers
+
+  // Bookmarks state
+  bookmarks: [],
+  setBookmarks: (bookmarks) => set({ bookmarks }),
+  addBookmark: (bookmark) => {
+    const state = get();
+    const exists = state.bookmarks.find(
+      b => b.id === bookmark.id && b.media_type === bookmark.media_type
+    );
+    if (!exists) {
+      const updated = [...state.bookmarks, bookmark];
+      set({ bookmarks: updated });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('bookmarks', JSON.stringify(updated));
+      }
+    }
+  },
+  removeBookmark: (id, mediaType) => {
+    const state = get();
+    const filtered = state.bookmarks.filter(
+      b => !(b.id === id && b.media_type === mediaType)
+    );
+    set({ bookmarks: filtered });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bookmarks', JSON.stringify(filtered));
+    }
+  },
+  isBookmarked: (id, mediaType) => {
+    const state = get();
+    return state.bookmarks.some(
+      b => b.id === id && b.media_type === mediaType
+    );
+  },
+
   handleSearch: async (query: string) => {
     const state = get();
     if (!query.trim()) {
       state.setSearchResults(null);
       return;
     }
-    
     state.setIsSearching(true);
     try {
       const res = await fetch(
@@ -83,7 +127,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
       state.setIsSearching(false);
     }
   },
-  
+
   clearSearch: () => {
     const state = get();
     state.setSearch("");
@@ -91,8 +135,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
     state.setShowModal(false);
     state.inputRef.current?.focus();
   },
-  
-  // Navigation helpers
+
   navigateToDefault: () => {
     const state = get();
     if (typeof window !== "undefined") {

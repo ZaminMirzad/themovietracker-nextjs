@@ -2,21 +2,56 @@
 
 import Header from "@/components/header";
 import SearchModal from "@/components/searchModal";
+import { ClerkProvider, useUser } from "@clerk/nextjs";
 import { useAppStore } from "@/store/useStore";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface LayoutContentProps {
   children: React.ReactNode;
 }
 
-export default function LayoutContent({ children }: LayoutContentProps) {
-  const { searchResults, isInputFocused, showModal, setShowModal } = useAppStore();
+function InnerLayout({ children }: { children: React.ReactNode }) {
+  const { searchResults, isInputFocused, showModal, setShowModal, setBookmarks } = useAppStore();
   const router = useRouter();
+  const { isSignedIn } = useUser();
+
+  useEffect(() => {
+    async function hydrateBookmarks() {
+      try {
+        if (isSignedIn) {
+          const res = await fetch('/api/bookmarks', { cache: 'no-store' });
+          if (!res.ok) {
+            setBookmarks([]);
+            return;
+          }
+          const text = await res.text();
+          const data = text ? JSON.parse(text) : { bookmarks: [] };
+          if (Array.isArray(data.bookmarks)) {
+            setBookmarks(data.bookmarks);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('bookmarks', JSON.stringify(data.bookmarks));
+            }
+          }
+        } else {
+          // Fallback to localStorage for signed-out users
+          const raw = typeof window !== 'undefined' ? localStorage.getItem('bookmarks') : null;
+          if (raw) {
+            setBookmarks(JSON.parse(raw));
+          } else {
+            setBookmarks([]);
+          }
+        }
+      } catch (e) {
+        console.error('hydrateBookmarks error', e);
+        setBookmarks([]);
+      }
+    }
+    hydrateBookmarks();
+  }, [isSignedIn, setBookmarks]);
 
   function handleClick(id: string | number, mediaType?: string) {
-    // Determine if it's a TV show or movie based on media_type or other properties
     const isTV = mediaType === 'tv' || (searchResults && searchResults.find(item => item.id === id)?.media_type === 'tv');
-    
     if (isTV) {
       router.push(`/tv/${id}`);
     } else {
@@ -28,8 +63,7 @@ export default function LayoutContent({ children }: LayoutContentProps) {
     <div className="p-6 max-w-7xl mx-auto">
       <Header />
       {children}
-      
-      {/* Global Search Modal */}
+
       <SearchModal
         open={isInputFocused && showModal && !!searchResults}
         results={
@@ -57,5 +91,13 @@ export default function LayoutContent({ children }: LayoutContentProps) {
         }}
       />
     </div>
+  );
+}
+
+export default function LayoutContent({ children }: LayoutContentProps) {
+  return (
+    <ClerkProvider>
+      <InnerLayout>{children}</InnerLayout>
+    </ClerkProvider>
   );
 }

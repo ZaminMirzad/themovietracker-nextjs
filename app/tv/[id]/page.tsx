@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import BookmarkButton from "@/components/bookmarkButton";
 
 export default function TVShowPage() {
-  const { id } = useParams();
+  const params = useParams();
   const router = useRouter();
+  const id = params.id as string;
   
   type TVShow = {
+    id?: number;
     poster_path?: string;
     backdrop_path?: string;
     name?: string;
@@ -167,9 +170,13 @@ export default function TVShowPage() {
           <h1 className="text-4xl font-bold mb-4">
             {tvShow?.name || "Loading..."}
           </h1>
-          <button className="flex items-center gap-2 text-sm border px-4 py-2 rounded-full">
-            <span>🔖</span> Add to watchlist
-          </button>
+          <BookmarkButton
+            id={tvShow?.id || 0}
+            title={tvShow?.name || ''}
+            poster_path={tvShow?.poster_path}
+            backdrop_path={tvShow?.backdrop_path}
+            media_type="tv"
+          />
         </div>
         
         <div className="flex flex-col lg:flex-row gap-8 mb-8">
@@ -216,7 +223,7 @@ export default function TVShowPage() {
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
               {isPlayingTrailer && selectedTrailer ? (
-                <div className="relative w-full h-[350px] rounded-xl overflow-hidden">
+                <div className="relative w-full h-[380px] rounded-xl overflow-hidden">
                   <iframe
                     src={`https://www.youtube.com/embed/${selectedTrailer}?autoplay=1&rel=0`}
                     title="Trailer"

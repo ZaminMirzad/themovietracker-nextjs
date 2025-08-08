@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import BookmarkButton from "@/components/bookmarkButton";
 
 export default function MoviePage() {
   const { id } = useParams();
   const router = useRouter();
   
   type Movie = {
+    id?: number;
     poster_path?: string;
     backdrop_path?: string;
     title?: string;
@@ -201,9 +203,13 @@ export default function MoviePage() {
           <h1 className="text-4xl font-bold mb-4">
             {movie?.title || "Loading..."}
           </h1>
-          <button className="flex items-center gap-2 text-sm border px-4 py-2 rounded-full">
-            <span>🔖</span> Add to watchlist
-          </button>
+          <BookmarkButton
+            id={movie?.id || 0}
+            title={movie?.title || ''}
+            poster_path={movie?.poster_path}
+            backdrop_path={movie?.backdrop_path}
+            media_type="movie"
+          />
         </div>
         
         <div className="flex flex-col lg:flex-row gap-8 mb-8">
@@ -274,7 +280,7 @@ export default function MoviePage() {
                     src={`https://image.tmdb.org/t/p/w500${movie?.backdrop_path}`}
                     alt="Movie Backdrop"
                     width={600}
-                    height={250}
+                    height={350}
                     className="rounded-xl object-cover w-full h-full"
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
