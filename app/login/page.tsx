@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,8 +20,6 @@ export default function LoginPage() {
     // Handle form submission
     console.log("Form submitted:", formData);
   };
-
-  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <main className="h-full  min-h-screen flex flex-col justify-center items-center">

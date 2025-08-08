@@ -25,7 +25,7 @@
   --color-light-input-placeholder: #999999;
 
   --color-light-border: #d1d1d1;
-  --color-light-accent: #007bff;
+  --color-light-accent: #37c6f3;
   --color-light-hover: #fcf4ff;
 
   /* dark mode colors */
@@ -38,7 +38,7 @@
   --color-dark-input-placeholder: #888888;
 
   --color-dark-border: #333333;
-  --color-dark-accent: #4f8cff;
+  --color-dark-accent: #37c6f3;
   --color-dark-hover: #2a004a;
 }
 
