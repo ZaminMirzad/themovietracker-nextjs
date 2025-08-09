@@ -6,76 +6,43 @@ import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FilteringTabs from "@/components/filteringTabs";
 import { useRouter } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
+import { db } from "@/lib/instantdb";
+import { useAppStore } from "@/store/useStore"
+
 
 export default function Home() {
   const router = useRouter();
-
-  type TrendingResult = {
-    backdrop_path?: string;
-    title?: string;
-    name?: string;
-    rating?: number;
-    media_type?: string;
-    [key: string]: any;
-  };
-
-  type TrendingData = {
-    results: TrendingResult[];
-    [key: string]: any;
-  };
   
-  const [weekTrending, setWeekTrending] = useState<TrendingData | null>(null);
-  const [popular, setPopular] = useState<TrendingData | null>(null);
-  const [upcoming, setUpcoming] = useState<TrendingData | null>(null);
-  const [popularTV, setPopularTV] = useState<TrendingData | null>(null);
-  const [topRatedTV, setTopRatedTV] = useState<TrendingData | null>(null);
+  // Get data and functions from store
+  const { movieData, fetchMovieData, setBookmarks } = useAppStore();
+  const { weekTrending, popular, upcoming, popularTV, topRatedTV, isLoading } = movieData;
 
   const [activeTab, setActiveTab] = useState<
     "all" | "currently" | "suggested" | "previously" | "tv"
   >("all");
 
+  // Fetch movie data on component mount
   useEffect(() => {
-    async function fetchTrending() {
-      const [trendingRes, popularRes, upcomingRes, popularTVRes, topRatedTVRes] = await Promise.all([
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/trending/all/week?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/movie/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/tv/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/tv/top_rated?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-      ]);
-      const [trendingData, popularData, upcomingData, popularTVData, topRatedTVData] = await Promise.all([
-        trendingRes.json(),
-        popularRes.json(),
-        upcomingRes.json(),
-        popularTVRes.json(),
-        topRatedTVRes.json(),
-      ]);
-      setWeekTrending(trendingData);
-      setPopular(popularData);
-      setUpcoming(upcomingData);
-      setPopularTV(popularTVData);
-      setTopRatedTV(topRatedTVData);
-    }
-
-    // Delay rendering for 1 second
-    setTimeout(() => fetchTrending(), 1000);
-  }, []);
+    fetchMovieData();
+  }, [fetchMovieData]);
 
   const handleSearchModalItemClick = (id: string | number) => {
     router.push(`/movie/${id}`);
   };
 
-  console.log("Week Trending Data:", weekTrending);
+  // Handle bookmarks from database
+  const { data } = db.useQuery({ bookmarks: {} });
+  useEffect(() => {
+    if (data?.bookmarks) {
+      // Ensure each bookmark has a movieId property as required by IBookmark
+      const bookmarksWithMovieId = data.bookmarks.map((bookmark: any) => ({
+        ...bookmark,
+        movieId: bookmark.movieId ?? bookmark.id,
+      }));
+      setBookmarks(bookmarksWithMovieId);
+    }
+  }, [data?.bookmarks, setBookmarks]);
 
   // render sections
   const renderSection = (title: string, items: any[]) => (
@@ -112,7 +79,8 @@ export default function Home() {
                     alt={title}
                     width={130}
                     height={70}
-                    className="rounded-lg object-cover overflow-hidden"
+                    
+                    className="rounded-lg object-cover overflow-hidden w-auto"
                   />
                   {rating && (
                     <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
@@ -142,6 +110,21 @@ export default function Home() {
     }
   }
   
+  // Show loading state
+  if (isLoading && !weekTrending) {
+    return (
+      <main>
+        <FilteringTabs setActiveTab={setActiveTab} activeTab={activeTab} />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading movie data...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main>
       <FilteringTabs setActiveTab={setActiveTab} activeTab={activeTab} />

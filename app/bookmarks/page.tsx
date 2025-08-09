@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/store/useStore";
+import { db } from "@/lib/instantdb";
 import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -8,10 +9,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function BookmarksPage() {
-  const { bookmarks } = useAppStore();
+
+  const { isLoading, error, data } = db.useQuery({ bookmarks: {} });
+  const { bookmarks: localBookmarks } = useAppStore();
   const router = useRouter();
   const { user } = useUser();
-
+  
   const handleClick = (id: string | number, mediaType: "movie" | "tv") => {
     if (mediaType === "tv") {
       router.push(`/tv/${id}`);
@@ -46,11 +49,11 @@ export default function BookmarksPage() {
             <h1 className="text-3xl font-bold text-white mb-2">My Bookmarks</h1>
             <p className="text-gray-400">
               Welcome back, {user?.fullName || user?.username}! You have{" "}
-              {bookmarks.length} bookmarked items.
+            {data?.bookmarks?.length || 0} bookmarked items.
             </p>
           </div>
 
-          {bookmarks.length === 0 ? (
+          {data?.bookmarks?.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-24 h-24 mx-auto mb-6 text-gray-500">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,11 +81,11 @@ export default function BookmarksPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {bookmarks.map((bookmark, index) => (
+              {data?.bookmarks?.map((bookmark, index) => (
                 <motion.div
-                  key={`${bookmark.id}-${bookmark.media_type}`}
+                  key={`${bookmark.movieId}-${bookmark.media_type}`}
                   className="bg-light-input-background text-light-input-text rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer group"
-                  onClick={() => handleClick(bookmark.id, bookmark.media_type)}
+                  onClick={() => handleClick(bookmark.movieId, bookmark.media_type as "movie" | "tv")}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -94,10 +97,10 @@ export default function BookmarksPage() {
                       src={`https://image.tmdb.org/t/p/w500${
                         bookmark.poster_path || bookmark.backdrop_path
                       }`}
-                      alt={bookmark.title}
+                      alt={bookmark.title || "No title"}
                       width={300}
                       height={450}
-                      className="w-full h-auto object-cover"
+                      className="w-full h-auto object-cover h-auto"
                     />
                     <div className="absolute top-2 right-2">
                       <span
@@ -120,12 +123,9 @@ export default function BookmarksPage() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2">
+                    <h3 className="text-light-input-text font-semibold text-sm mb-1 line-clamp-2">
                       {bookmark.title}
                     </h3>
-                    <p className="text-gray-400 text-xs">
-                      Added {new Date(bookmark.added_at).toLocaleDateString()}
-                    </p>
                   </div>
                 </motion.div>
               ))}

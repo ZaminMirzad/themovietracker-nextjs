@@ -55,6 +55,13 @@ npm install
 NEXT_PUBLIC_API_KEY=your_tmdb_api_key
 NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
 NEXT_PUBLIC_IMAGE_BASE_URL=https://image.tmdb.org/t/p/w500
+
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
+CLERK_SECRET_KEY=...
+
+# InstantDB (server key must NOT be exposed to client)
+INSTANTDB_ADMIN_KEY=...
 ```
 
 3. Run the development server:
@@ -88,3 +95,9 @@ The search is handled entirely through the Zustand store:
 - Modal management
 
 Built with ❤️ by Zamin Mirzad
+
+## Bookmarks persistence
+
+- Stored in InstantDB via server-side API and mirrored in localStorage for offline UX.
+- API: `GET/POST/DELETE /api/bookmarks` (uses Clerk auth server-side).
+- Client: optimistic updates; hydrates on sign-in.

@@ -171,11 +171,12 @@ export default function TVShowPage() {
             {tvShow?.name || "Loading..."}
           </h1>
           <BookmarkButton
-            id={tvShow?.id || 0}
+            movieId={tvShow?.id}
             title={tvShow?.name || ''}
             poster_path={tvShow?.poster_path}
             backdrop_path={tvShow?.backdrop_path}
             media_type="tv"
+            
           />
         </div>
         
@@ -186,7 +187,7 @@ export default function TVShowPage() {
               alt={tvShow?.name || "TV Show poster"}
               width={110}
               height={350}
-              className="rounded-xl w-full object-cover"
+              className="rounded-xl w-full object-cover h-auto"
             />
           </div>
           
@@ -245,7 +246,7 @@ export default function TVShowPage() {
                     alt="TV Show Backdrop"
                     width={600}
                     height={250}
-                    className="rounded-xl object-cover w-full h-full"
+                    className="rounded-xl object-cover w-full h-auto"
                   />
                   {trailers.length > 0 && (
                     <button
@@ -408,7 +409,7 @@ export default function TVShowPage() {
                         alt={selectedEpisode.name}
                         width={400}
                         height={300}
-                        className="rounded-xl object-cover w-full h-full"
+                        className="rounded-xl object-cover w-full h-auto"
                       />
                       {episodeTrailers.length > 0 && (
                         <button

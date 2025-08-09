@@ -36,7 +36,7 @@ export default function ProfilePage() {
                   alt={user?.fullName || user?.username || "User"}
                   width={80}
                   height={80}
-                  className="rounded-full"
+                  className="rounded-full h-auto"
                 />
               ) : (
                 <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center">
@@ -129,7 +129,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {bookmarks.slice(0, 8).map((bookmark, index) => (
                   <motion.div
-                    key={`${bookmark.id}-${bookmark.media_type}`}
+                    key={`${bookmark.movieId}-${bookmark.media_type}`}
                     className="bg-[#333333] rounded-lg overflow-hidden cursor-pointer hover:bg-[#444444] transition-colors duration-200"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -137,7 +137,7 @@ export default function ProfilePage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Link href={`/${bookmark.media_type}/${bookmark.id}`}>
+                    <Link href={`/${bookmark.media_type}/${bookmark.movieId}`}>
                       <div className="relative">
                         <Image
                           src={`https://image.tmdb.org/t/p/w500${bookmark.poster_path || bookmark.backdrop_path}`}

@@ -96,7 +96,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
 export default function LayoutContent({ children }: LayoutContentProps) {
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey="pk_test_am9pbnQtbGFjZXdpbmctODkuY2xlcmsuYWNjb3VudHMuZGV2JA">
       <InnerLayout>{children}</InnerLayout>
     </ClerkProvider>
   );
