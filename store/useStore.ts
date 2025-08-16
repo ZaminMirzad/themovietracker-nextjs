@@ -132,8 +132,6 @@ interface IAppState {
   // Search functionality
   search: string;
   setSearch: (val: string) => void;
-  isInputFocused: boolean;
-  setIsInputFocused: (val: boolean) => void;
   showModal: boolean;
   setShowModal: (val: boolean) => void;
   searchResults: ISearchResult[] | null;
@@ -183,8 +181,6 @@ export const useAppStore = create<IAppState>((set, get) => ({
   // Search state
   search: "",
   setSearch: (val) => set({ search: val }),
-  isInputFocused: false,
-  setIsInputFocused: (val) => set({ isInputFocused: val }),
   showModal: false,
   setShowModal: (val) => set({ showModal: val }),
   searchResults: null,
@@ -236,38 +232,30 @@ export const useAppStore = create<IAppState>((set, get) => ({
     state.setMovieData({ isLoading: true });
     
     try {
-      const [trendingRes, popularRes, upcomingRes, popularTVRes, topRatedTVRes] = await Promise.all([
+      const [weekTrending, popular, upcoming, popularTV, topRatedTV] = await Promise.all([
         fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/trending/all/week?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
+          `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+        ).then(res => res.json()),
         fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/movie/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
+          `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+        ).then(res => res.json()),
         fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
+          `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+        ).then(res => res.json()),
         fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/tv/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
+          `https://api.themoviedb.org/3/tv/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+        ).then(res => res.json()),
         fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/tv/top_rated?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-      ]);
-      
-      const [trendingData, popularData, upcomingData, popularTVData, topRatedTVData] = await Promise.all([
-        trendingRes.json(),
-        popularRes.json(),
-        upcomingRes.json(),
-        popularTVRes.json(),
-        topRatedTVRes.json(),
+          `https://api.themoviedb.org/3/tv/top_rated?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+        ).then(res => res.json()),
       ]);
       
       state.setMovieData({
-        weekTrending: trendingData,
-        popular: popularData,
-        upcoming: upcomingData,
-        popularTV: popularTVData,
-        topRatedTV: topRatedTVData,
+        weekTrending,
+        popular,
+        upcoming,
+        popularTV,
+        topRatedTV,
         isLoading: false,
       });
     } catch (error) {
@@ -538,17 +526,22 @@ export const useAppStore = create<IAppState>((set, get) => ({
     const state = get();
     if (!query.trim()) {
       state.setSearchResults(null);
+      state.setIsSearching(false);
+      state.setShowModal(false);
       return;
     }
     state.setIsSearching(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/search/multi?api_key=${
+        `https://api.themoviedb.org/3/search/multi?api_key=${
           process.env.NEXT_PUBLIC_API_KEY
         }&query=${encodeURIComponent(query)}`
       );
       const data = await res.json();
       state.setSearchResults(data.results || []);
+      if (data.results && data.results.length > 0) {
+        state.setShowModal(true);
+      }
     } catch (error) {
       console.error("Search error:", error);
       state.setSearchResults(null);

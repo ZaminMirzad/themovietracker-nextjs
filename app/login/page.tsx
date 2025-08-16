@@ -1,8 +1,7 @@
 "use client";
 
-import { SignIn,useAuth } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { init } from "@instantdb/react";
-import { useEffect } from "react";
 
 export default function LoginPage() {
   const { isSignedIn, getToken,signOut } = useAuth();

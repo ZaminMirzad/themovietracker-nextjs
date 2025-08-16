@@ -5,7 +5,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import BookmarkButton from "@/components/bookmarkButton";
 import { useAppStore } from "@/store/useStore";
-import type { ICast, ICrew, ITrailer } from "@/store/useStore";
+import { filterCastWithProfileImages, filterAndLimitMedia } from "@/lib/mediaFilters";
+import { usePersonDetails } from "@/lib/hooks/usePersonDetails";
 
 export default function MoviePage() {
   const params = useParams();
@@ -29,10 +30,20 @@ export default function MoviePage() {
 
   const [selectedTrailer, setSelectedTrailer] = useState<string>("");
   const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
-  const [selectedCast, setSelectedCast] = useState<ICast | null>(null);
-  const [selectedCrew, setSelectedCrew] = useState<ICrew | null>(null);
-  const [showCastModal, setShowCastModal] = useState(false);
-  const [showCrewModal, setShowCrewModal] = useState(false);
+
+  const { 
+    selectedPerson: selectedCast, 
+    showModal: showCastModal, 
+    handlePersonClick: handleCastClick, 
+    closeModal: closeCastModal 
+  } = usePersonDetails();
+
+  const { 
+    selectedPerson: selectedCrew, 
+    showModal: showCrewModal, 
+    handlePersonClick: handleCrewClick, 
+    closeModal: closeCrewModal 
+  } = usePersonDetails();
 
   useEffect(() => {
     if (!movieId) return;
@@ -50,19 +61,6 @@ export default function MoviePage() {
     }
   }, [trailers]);
 
-  const handleCastClick = useCallback(async (castMember: ICast) => {
-    try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/person/${castMember.id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-      );
-      const details = await res.json();
-      setSelectedCast({ ...castMember, ...details });
-      setShowCastModal(true);
-    } catch (error) {
-      console.error("Error fetching cast details:", error);
-    }
-  }, []);
-
   const handleClick = useCallback((id: string | number) => {
     router.push(`/movie/${id}`);
   }, [router]);
@@ -73,19 +71,6 @@ export default function MoviePage() {
 
   const handlePauseTrailer = useCallback(() => {
     setIsPlayingTrailer(false);
-  }, []);
-
-  const handleCrewClick = useCallback(async (crewMember: ICrew) => {
-    try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/person/${crewMember.id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-      );
-      const details = await res.json();
-      setSelectedCrew({ ...crewMember, ...details });
-      setShowCrewModal(true);
-    } catch (error) {
-      console.error("Error fetching crew details:", error);
-    }
   }, []);
 
   const formatCurrency = (amount: number) => {
@@ -106,16 +91,16 @@ export default function MoviePage() {
   // Show loading state
   if (isLoading || !movie) {
     return (
-      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <main className="min-h-screen bg-background dark:bg-dark-background">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="animate-pulse">
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-8"></div>
+            <div className="h-12 bg-muted dark:bg-dark-muted rounded w-3/4 mb-8"></div>
             <div className="flex flex-col lg:flex-row gap-8">
-              <div className="w-full lg:w-1/3 h-[500px] bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+              <div className="w-full lg:w-1/3 h-[500px] bg-muted dark:bg-dark-muted rounded-xl"></div>
               <div className="flex-1 space-y-4">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-6 bg-muted dark:bg-dark-muted rounded w-1/2"></div>
+                <div className="bg-muted/50 dark:bg-dark-muted/50 rounded-lg p-4"></div>
+                <div className="h-4 bg-muted dark:bg-dark-muted rounded w-3/4"></div>
               </div>
             </div>
           </div>
@@ -125,15 +110,15 @@ export default function MoviePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen bg-background dark:bg-dark-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-4xl font-bold text-foreground dark:text-dark-foreground mb-2">
               {movie.title}
             </h1>
             {movie.tagline && (
-              <p className="text-lg text-gray-600 dark:text-gray-400 italic">
+              <p className="text-lg text-muted-foreground dark:text-dark-muted-foreground italic">
                 {movie.tagline}
               </p>
             )}
@@ -151,7 +136,7 @@ export default function MoviePage() {
           {/* Left Column - Poster */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+              <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted dark:bg-dark-muted">
                 {movie.poster_path ? (
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path || ''}`}
@@ -162,7 +147,7 @@ export default function MoviePage() {
                     priority
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground dark:text-dark-muted-foreground">
                     <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                     </svg>
@@ -180,7 +165,7 @@ export default function MoviePage() {
                 {movie.genres.map((genre) => (
                   <span 
                     key={genre.id} 
-                    className="inline-block bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-sm px-3 py-1 rounded-full"
+                    className="inline-block bg-accent/20 dark:bg-accent/30 text-accent dark:text-accent-foreground text-sm px-3 py-1 rounded-full"
                   >
                     {genre.name}
                   </span>
@@ -190,8 +175,8 @@ export default function MoviePage() {
 
             {/* Overview */}
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Overview</h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-dark-foreground">Overview</h2>
+              <p className="text-muted-foreground dark:text-dark-muted-foreground leading-relaxed">
                 {movie.overview || 'No overview available.'}
               </p>
             </div>
@@ -244,16 +229,16 @@ export default function MoviePage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span 
                           key={star} 
-                          className={`text-${star <= Math.round((movie.vote_average || 0) / 2) ? 'yellow-400' : 'gray-300'} text-sm`}
+                          className={`text-${star <= Math.round((movie.vote_average || 0) / 2) ? 'yellow-400' : 'gray-400 dark:text-gray-600'} text-sm`}
                         >
                           ★
                         </span>
                       ))}
                     </div>
-                    <span className="font-medium text-gray-900 dark:text-white">
+                    <span className="font-medium text-foreground dark:text-dark-foreground">
                       {movie.vote_average?.toFixed(1) || 'N/A'}
                     </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-muted-foreground dark:text-dark-muted-foreground">
                       ({movie.vote_count?.toLocaleString() || '0'} votes)
                     </span>
                   </div>
@@ -277,7 +262,7 @@ export default function MoviePage() {
                       />
                       <button
                         onClick={handlePauseTrailer}
-                        className="absolute top-4 right-4 bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-90 transition-colors"
+                        className="absolute top-4 right-4 bg-dark-background bg-opacity-70 text-dark-foreground p-2 rounded-full hover:bg-opacity-90 transition-colors"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -347,7 +332,7 @@ export default function MoviePage() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Cast</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-              {cast.map((actor) => (
+              {filterCastWithProfileImages(cast).map((actor) => (
                 <div 
                   key={actor.id} 
                   className="text-center cursor-pointer group"
@@ -387,7 +372,7 @@ export default function MoviePage() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">You May Also Like</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {relatedMovies.map((relatedMovie) => (
+              {filterAndLimitMedia(relatedMovies).map((relatedMovie) => (
                 <div
                   key={relatedMovie.id}
                   className="cursor-pointer group"
@@ -403,7 +388,7 @@ export default function MoviePage() {
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
                     {relatedMovie.vote_average && (
-                      <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <div className="absolute top-2 left-2 bg-black/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                         <span className="text-yellow-400">★</span>
                         {relatedMovie.vote_average.toFixed(1)}
                       </div>
@@ -427,7 +412,7 @@ export default function MoviePage() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Crew</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-              {crew.map((member) => (
+              {filterCastWithProfileImages(crew).map((member) => (
                 <div 
                   key={`${member.id}-${member.job}`} 
                   className="text-center cursor-pointer group"
@@ -501,7 +486,7 @@ export default function MoviePage() {
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
                     {relatedMovie.vote_average && (
-                      <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <div className="absolute top-2 left-2 bg-black/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                         <span className="text-yellow-400">★</span>
                         {relatedMovie.vote_average.toFixed(1)}
                       </div>
@@ -530,7 +515,7 @@ export default function MoviePage() {
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-2xl font-bold">{selectedCast.name}</h2>
                 <button
-                  onClick={() => setShowCastModal(false)}
+                  onClick={() => closeCastModal()}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-xl"
                 >
                   ✕
@@ -614,7 +599,7 @@ export default function MoviePage() {
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-2xl font-bold">{selectedCrew.name}</h2>
                 <button
-                  onClick={() => setShowCrewModal(false)}
+                  onClick={() => closeCrewModal()}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-xl"
                 >
                   ✕

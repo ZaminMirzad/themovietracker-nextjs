@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FilteringTabs from "@/components/filteringTabs";
 import { useRouter } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/instantdb";
 import { useAppStore } from "@/store/useStore"
 
@@ -27,9 +26,6 @@ export default function Home() {
     fetchMovieData();
   }, [fetchMovieData]);
 
-  const handleSearchModalItemClick = (id: string | number) => {
-    router.push(`/movie/${id}`);
-  };
 
   // Handle bookmarks from database
   const { data } = db.useQuery({ bookmarks: {} });
