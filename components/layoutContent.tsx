@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/components/header";
-import SearchModal from "@/components/searchModal";
+import Footer from "@/components/Footer";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
 import { useAppStore } from "@/store/useStore";
 import { useEffect } from "react";
@@ -12,8 +12,7 @@ interface LayoutContentProps {
 }
 
 function InnerLayout({ children }: { children: React.ReactNode }) {
-  const { searchResults, isInputFocused, showModal, setShowModal, setBookmarks } = useAppStore();
-  const router = useRouter();
+  const { setBookmarks } = useAppStore();
   const { isSignedIn } = useUser();
 
   useEffect(() => {
@@ -50,47 +49,18 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     hydrateBookmarks();
   }, [isSignedIn, setBookmarks]);
 
-  function handleClick(id: string | number, mediaType?: string) {
-    const isTV = mediaType === 'tv' || (searchResults && searchResults.find(item => item.id === id)?.media_type === 'tv');
-    if (isTV) {
-      router.push(`/tv/${id}`);
-    } else {
-      router.push(`/movie/${id}`);
-    }
-  }
+
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <>
       <Header />
-      {children}
-
-      <SearchModal
-        open={isInputFocused && showModal && !!searchResults}
-        results={
-          searchResults
-            ? searchResults
-                .filter(
-                  (item) =>
-                    (item.backdrop_path || item.poster_path) &&
-                    item.id !== undefined
-                )
-                .map((item) => ({
-                  id: item.id,
-                  backdrop_path: item.backdrop_path,
-                  poster_path: item.poster_path,
-                  title: item.title,
-                  name: item.name,
-                  media_type: item.media_type,
-                }))
-            : []
-        }
-        onClose={() => setShowModal(false)}
-        onItemClick={(id, mediaType) => {
-          setShowModal(false);
-          handleClick(id, mediaType);
-        }}
-      />
-    </div>
+      <main className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {children}
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
 

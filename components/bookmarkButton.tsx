@@ -15,6 +15,8 @@ interface BookmarkButtonProps {
   variant?: 'default' | 'minimal';
 }
 
+
+
 export default function BookmarkButton({ 
   movieId, 
   title, 
@@ -26,7 +28,7 @@ export default function BookmarkButton({
 }: BookmarkButtonProps) {
   const { isBookmarked, addBookmark, removeBookmark } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
 
   // Ensure hooks are always called, handle invalid movieId in render
   const isBookmarkedState = movieId ? isBookmarked(movieId, media_type) : false;
@@ -35,7 +37,6 @@ export default function BookmarkButton({
     if (!movieId) return;
     
     setIsLoading(true);
-    setError(null);
     
     try {
       const bookmarkData = {
@@ -77,7 +78,6 @@ export default function BookmarkButton({
         }
       }
     } catch (err) {
-      setError('Failed to update bookmark');
       console.error('Bookmark error:', err);
     } finally {
       setIsLoading(false);

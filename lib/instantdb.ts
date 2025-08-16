@@ -1,7 +1,7 @@
 "use client";
 
 import schema from "@/instant.schema";
-import { id, i, init, InstaQLEntity } from "@instantdb/react";
+import { init, InstaQLEntity } from "@instantdb/react";
 
 export type MediaType = "movie" | "tv";
 
