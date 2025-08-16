@@ -10,6 +10,17 @@ import { db } from "@/lib/instantdb";
 import { useAppStore } from "@/store/useStore"
 
 
+interface MediaItem {
+  id: string | number;
+  movieId?: string | number;
+  backdrop_path?: string;
+  title?: string;
+  name?: string;
+  rating?: number;
+  media_type?: string;
+  first_air_date?: string;
+}
+
 export default function Home() {
   const router = useRouter();
   
@@ -32,16 +43,18 @@ export default function Home() {
   useEffect(() => {
     if (data?.bookmarks) {
       // Ensure each bookmark has a movieId property as required by IBookmark
-      const bookmarksWithMovieId = data.bookmarks.map((bookmark: any) => ({
+      const bookmarksWithMovieId = data.bookmarks.map((bookmark: MediaItem) => ({
         ...bookmark,
         movieId: bookmark.movieId ?? bookmark.id,
+        title: bookmark.title || bookmark.name || 'Untitled',
+        media_type: (bookmark.media_type as 'movie' | 'tv') || 'movie',
       }));
       setBookmarks(bookmarksWithMovieId);
     }
   }, [data?.bookmarks, setBookmarks]);
 
   // render sections
-  const renderSection = (title: string, items: any[]) => (
+  const renderSection = (title: string, items: MediaItem[]) => (
     <div className="mb-8">
       <h2 className="text-lg mb-3">{title}</h2>
       <div className="flex gap-4 overflow-hidden flex-wrap p-2">
@@ -58,7 +71,7 @@ export default function Home() {
               const src = typeof item === "string" ? item : item.backdrop_path;
               const rating = typeof item === "object" && item.rating;
               const title = item.title || item.name;
-              const isTV = item.media_type === 'tv' || item.first_air_date;
+                             const isTV = Boolean(item.media_type === 'tv' || item.first_air_date);
               
               return (
                 <motion.div
@@ -70,11 +83,11 @@ export default function Home() {
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => handleClick(item.id, isTV)}
                 >
-                  <Image
-                    src={process.env.NEXT_PUBLIC_IMAGE_BASE_URL + src}
-                    alt={title}
-                    width={130}
-                    height={70}
+                                     <Image
+                     src={(process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '') + (src || '')}
+                     alt={title || 'Image'}
+                     width={130}
+                     height={70}
                     
                     className="rounded-lg object-cover overflow-hidden w-auto"
                   />
@@ -149,18 +162,6 @@ export default function Home() {
           {renderSection("Top Rated TV Shows", topRatedTV?.results || [])}
         </>
       )}
-
-      {/* navigation links */}
-      <nav>
-        {/* Prefetched when the link is hovered or enters the viewport */}
-        <Link href="/login">Login</Link>
-        <Link href="/signup">Sign Up</Link>
-      </nav>
-
-      {/* built with love by */}
-      <p className="text-sm text-gray-400 place-self-end ">
-        Built with <span className="text-red-500">❤️</span> by Zamin Mirzad
-      </p>
     </main>
   );
 }

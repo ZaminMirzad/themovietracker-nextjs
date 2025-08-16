@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { init } from "@instantdb/react";
 
 export default function LoginPage() {
-  const { isSignedIn, getToken,signOut } = useAuth();
+  const { getToken, signOut } = useAuth();
   const db = init({ appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID ||"c44f4cc0-9caa-459c-8c8b-8e655445d4f8" });
 
 
@@ -32,13 +32,9 @@ export default function LoginPage() {
   //   }
   // }, []);
 
-  const { isLoading, user, error } = db.useAuth();
+  const { user } = db.useAuth();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div>Error signing in to Instant! {error.message}</div>;
+
 
 
     if (user) {
@@ -65,7 +61,8 @@ export default function LoginPage() {
           Sign in to Instant
         </button>
       </div>
-    );  }
+    );
+}
   // if (user) {
   // return (
   //   <main className="min-h-screen flex items-center justify-center bg-light-background dark:bg-dark-background text-dark-background dark:text-dark-foreground p-4">
@@ -84,5 +81,5 @@ export default function LoginPage() {
   //     />
   //   </main>
   // );
-}
+
 

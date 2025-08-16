@@ -1,6 +1,5 @@
 "use client";
 
-
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -55,9 +54,18 @@ export default function TVShowPage() {
     vote_average?: number;
     runtime?: number;
   };
+
+  type Season = {
+    id: number;
+    name: string;
+    overview: string;
+    poster_path?: string;
+    season_number: number;
+    episodes: Episode[];
+  };
   
   const [tvShow, setTvShow] = useState<TVShow | null>(null);
-  const [seasons, setSeasons] = useState<any[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [relatedShows, setRelatedShows] = useState<RelatedShow[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
@@ -89,10 +97,10 @@ export default function TVShowPage() {
 
         // Fetch seasons data
         if (tvData.number_of_seasons) {
-          const seasonsData = [];
+          const seasonsData: Season[] = [];
           for (let i = 1; i <= tvData.number_of_seasons; i++) {
             const seasonData = await tvApi.getSeason(id, i);
-            seasonsData.push(seasonData);
+            seasonsData.push(seasonData as Season);
           }
           setSeasons(seasonsData);
         }

@@ -2,13 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { Heart, Github, Twitter, Instagram, Film } from "lucide-react";
+import { Heart, Github, X, Instagram, Film } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-white mt-16">
+    <footer className="bg-gradient-to-b from-gray-900 to-black text-light-foreground dark:text-dark-foreground mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -20,7 +20,7 @@ const Footer = () => {
                 MovieTracker
               </span>
             </div>
-            <p className="text-gray-300 mb-4 max-w-md">
+            <p className=" mb-4 max-w-md">
               Discover, track, and share your favorite movies and TV shows. 
               Built with modern technology and passion for cinema.
             </p>
@@ -32,7 +32,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 ">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors">
@@ -108,7 +108,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                <Twitter className="h-6 w-6" />
+                <X className="h-6 w-6" />
               </a>
               <a 
                 href="https://instagram.com" 

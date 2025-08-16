@@ -61,7 +61,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-2">
-            <h1 className="text-4xl font-bold text-light-foreground">The <br /> Movie <br /> Tracker</h1>
+            <h1 className="text-4xl font-bold text-light-foreground dark:text-dark-foreground">The <br /> Movie <br /> Tracker</h1>
           </Link>
 
           <div className="flex-1 max-w-md mx-8">
@@ -74,7 +74,7 @@ export default function Header() {
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                className="w-full px-4 py-2 bg-light-background border border-gray-600 rounded-full text-light-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-input-border"
+                className="w-full px-4 py-2 bg-light-background dark:bg-dark-background border border-gray-600 rounded-full text-light-foreground dark:text-dark-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-input-border dark:focus:ring-dark-accent"
               />
               {search && (
                 <button
