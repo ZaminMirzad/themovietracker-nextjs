@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 
 interface SearchModalProps {
   open: boolean;
@@ -29,11 +30,11 @@ export default function SearchModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-40"
+      className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-20 sm:pt-40 px-4"
       onClick={onClose}
     >
       <motion.div
-        className="bg-white dark:bg-dark-background rounded-xl shadow-2xl p-6 w-fit max-w-4xl"
+        className="bg-white dark:bg-dark-background rounded-xl shadow-2xl p-4 sm:p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -41,21 +42,21 @@ export default function SearchModal({
         transition={{ duration: 0.2 }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Search Results</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Search Results</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            ✕
+            <X className="w-5 h-5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" />
           </button>
         </div>
 
         {results.length === 0 ? (
           <div className="text-gray-500 dark:text-gray-400 text-center py-8">
-            No results found.
+            <p className="text-sm sm:text-base">No results found.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
             <AnimatePresence>
               {results.slice(0, 12).map((item, idx) => (
                 <motion.div
@@ -85,7 +86,7 @@ export default function SearchModal({
                       </div>
                     )}
                   </div>
-                  <div className="mt-2 text-xs font-medium text-center line-clamp-2">
+                  <div className="mt-2 text-xs font-medium text-center line-clamp-2 leading-tight">
                     {item.title || item.name}
                   </div>
                 </motion.div>

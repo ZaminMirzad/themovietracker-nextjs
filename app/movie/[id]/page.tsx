@@ -91,14 +91,14 @@ export default function MoviePage() {
   if (isLoading || !movie) {
     return (
       <main className="min-h-screen bg-background dark:bg-dark-background">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
           <div className="animate-pulse">
-            <div className="h-12 bg-muted dark:bg-dark-muted rounded w-3/4 mb-8"></div>
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="w-full lg:w-1/3 h-[500px] bg-muted dark:bg-dark-muted rounded-xl"></div>
-              <div className="flex-1 space-y-4">
-                <div className="h-6 bg-muted dark:bg-dark-muted rounded w-1/2"></div>
-                <div className="bg-muted/50 dark:bg-dark-muted/50 rounded-lg p-4"></div>
+            <div className="h-8 sm:h-12 bg-muted dark:bg-dark-muted rounded w-3/4 mb-6 sm:mb-8"></div>
+            <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
+              <div className="w-full lg:w-1/3 h-[300px] sm:h-[500px] bg-muted dark:bg-dark-muted rounded-xl max-w-sm mx-auto lg:mx-0"></div>
+              <div className="flex-1 space-y-3 sm:space-y-4">
+                <div className="h-5 sm:h-6 bg-muted dark:bg-dark-muted rounded w-1/2"></div>
+                <div className="bg-muted/50 dark:bg-dark-muted/50 rounded-lg p-3 sm:p-4"></div>
                 <div className="h-4 bg-muted dark:bg-dark-muted rounded w-3/4"></div>
               </div>
             </div>
@@ -110,14 +110,14 @@ export default function MoviePage() {
 
   return (
     <main className="min-h-screen bg-background dark:bg-dark-background">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground dark:text-dark-foreground mb-2">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+          <div className="flex-1">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-dark-foreground mb-2">
               {movie.title}
             </h1>
             {movie.tagline && (
-              <p className="text-lg text-muted-foreground dark:text-dark-muted-foreground italic">
+              <p className="text-base sm:text-lg text-muted-foreground dark:text-dark-muted-foreground italic">
                 {movie.tagline}
               </p>
             )}
@@ -132,11 +132,11 @@ export default function MoviePage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* Left Column - Poster */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted dark:bg-dark-muted">
+              <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted dark:bg-dark-muted max-w-sm mx-auto lg:mx-0">
                 {movie.poster_path ? (
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path || ""}`}
@@ -166,7 +166,7 @@ export default function MoviePage() {
           </div>
 
           {/* Right Column - Details */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Genres */}
             {movie.genres && movie.genres.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -183,22 +183,22 @@ export default function MoviePage() {
 
             {/* Overview */}
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-dark-foreground">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-foreground dark:text-dark-foreground">
                 Overview
               </h2>
-              <p className="text-muted-foreground dark:text-dark-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground dark:text-dark-muted-foreground leading-relaxed">
                 {movie.overview || "No overview available."}
               </p>
             </div>
 
             {/* Movie Info */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-light-foreground dark:text-dark-foreground">
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-light-foreground dark:text-dark-foreground">
                 Movie Details
               </h2>
 
               {/* Basic Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -290,12 +290,12 @@ export default function MoviePage() {
 
             {/* Trailer Section */}
             {trailers && trailers.length > 0 && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-foreground dark:text-dark-foreground">
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-dark-foreground">
                     Trailer
                   </h2>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-dark-muted-foreground">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground dark:text-dark-muted-foreground">
                     <svg
                       className="w-4 h-4"
                       fill="currentColor"
@@ -413,17 +413,17 @@ export default function MoviePage() {
 
         {/* Cast Section */}
         {cast && cast.length > 0 && (
-          <div className="mb-16">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-foreground dark:text-dark-foreground">
+          <div className="mb-12 sm:mb-16">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground dark:text-dark-foreground">
                 Cast
               </h2>
-              <span className="text-sm text-muted-foreground dark:text-dark-muted-foreground bg-muted dark:bg-dark-muted px-3 py-1 rounded-full">
+              <span className="text-xs sm:text-sm text-muted-foreground dark:text-dark-muted-foreground bg-muted dark:bg-dark-muted px-2 sm:px-3 py-1 rounded-full">
                 {cast.length} members
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-6">
               {filterCastWithProfileImages(cast)
                 .slice(0, 16)
                 .map((actor) => (
@@ -432,8 +432,8 @@ export default function MoviePage() {
                     className="group cursor-pointer text-center"
                     onClick={() => handleCastClick(actor)}
                   >
-                    <div className="relative mb-4 mx-auto">
-                      <div className="relative overflow-hidden rounded-2xl w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <div className="relative mb-3 sm:mb-4 mx-auto">
+                      <div className="relative overflow-hidden rounded-2xl w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 shadow-lg group-hover:shadow-xl transition-all duration-300">
                         {actor.profile_path ? (
                           <Image
                             src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
@@ -466,7 +466,7 @@ export default function MoviePage() {
                       </div>
                     </div>
 
-                    <h3 className="text-sm font-semibold text-foreground dark:text-dark-foreground line-clamp-1 group-hover:text-accent transition-colors duration-200">
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground dark:text-dark-foreground line-clamp-1 group-hover:text-accent transition-colors duration-200">
                       {actor.name || "Cast member"}
                     </h3>
                     <p className="text-xs text-muted-foreground dark:text-dark-muted-foreground line-clamp-1 mt-1">
@@ -480,12 +480,12 @@ export default function MoviePage() {
 
         {/* Related Movies */}
         {relatedMovies && relatedMovies.length > 0 && (
-          <div className="mb-16">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-foreground dark:text-dark-foreground">
+          <div className="mb-12 sm:mb-16">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground dark:text-dark-foreground">
                 You May Also Like
               </h2>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-dark-muted-foreground">
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground dark:text-dark-muted-foreground">
                 <svg
                   className="w-4 h-4"
                   fill="currentColor"
@@ -497,7 +497,7 @@ export default function MoviePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
               {filterAndLimitMedia(relatedMovies)
                 .slice(0, 6)
                 .map((relatedMovie) => (
@@ -558,17 +558,17 @@ export default function MoviePage() {
 
         {/* Crew Section */}
         {crew && crew.length > 0 && (
-          <div className="mb-16">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-foreground dark:text-dark-foreground">
+          <div className="mb-12 sm:mb-16">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground dark:text-dark-foreground">
                 Crew
               </h2>
-              <span className="text-sm text-muted-foreground dark:text-dark-muted-foreground bg-muted dark:bg-dark-muted px-3 py-1 rounded-full">
+              <span className="text-xs sm:text-sm text-muted-foreground dark:text-dark-muted-foreground bg-muted dark:bg-dark-muted px-2 sm:px-3 py-1 rounded-full">
                 {crew.length} members
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-6">
               {filterCastWithProfileImages(crew)
                 .slice(0, 16)
                 .map((member) => (
@@ -577,8 +577,8 @@ export default function MoviePage() {
                     className="group cursor-pointer text-center"
                     onClick={() => handleCrewClick(member)}
                   >
-                    <div className="relative mb-4 mx-auto">
-                      <div className="relative overflow-hidden rounded-2xl w-20 h-20 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <div className="relative mb-3 sm:mb-4 mx-auto">
+                      <div className="relative overflow-hidden rounded-2xl w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 shadow-lg group-hover:shadow-xl transition-all duration-300">
                         {member.profile_path ? (
                           <Image
                             src={`https://image.tmdb.org/t/p/w500${member.profile_path}`}
@@ -618,26 +618,26 @@ export default function MoviePage() {
         {/* Production Companies */}
         {movie?.production_companies &&
           movie.production_companies.length > 0 && (
-            <div className="mb-16">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-bold text-foreground dark:text-dark-foreground">
+            <div className="mb-12 sm:mb-16">
+              <div className="flex items-center justify-between mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground dark:text-dark-foreground">
                   Production Companies
                 </h2>
-                <span className="text-sm text-muted-foreground dark:text-dark-muted-foreground bg-muted dark:bg-dark-muted px-3 py-1 rounded-full">
+                <span className="text-xs sm:text-sm text-muted-foreground dark:text-dark-muted-foreground bg-muted dark:bg-dark-muted px-2 sm:px-3 py-1 rounded-full">
                   {movie.production_companies.length} companies
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {movie.production_companies.map((company) => (
                   <div
                     key={company.id}
-                    className="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    className="group bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="flex items-center gap-4">
                       <div className="flex-shrink-0">
                         {company.logo_path ? (
-                          <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-xl p-3 shadow-inner">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white dark:bg-gray-700 rounded-xl p-2 sm:p-3 shadow-inner">
                             <Image
                               src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
                               alt={company.name}
@@ -647,14 +647,14 @@ export default function MoviePage() {
                             />
                           </div>
                         ) : (
-                          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-xl flex items-center justify-center shadow-inner">
-                            <span className="text-2xl">🏢</span>
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-xl flex items-center justify-center shadow-inner">
+                            <span className="text-xl sm:text-2xl">🏢</span>
                           </div>
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-foreground dark:text-dark-foreground group-hover:text-accent transition-colors duration-200 line-clamp-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-dark-foreground group-hover:text-accent transition-colors duration-200 line-clamp-2">
                           {company.name}
                         </h3>
                         {/* Company details could be added here if available in the API response */}

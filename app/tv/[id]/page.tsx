@@ -145,10 +145,10 @@ export default function TVShowPage() {
 
   return (
     <main>
-      {/* TV Show Details */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-4xl font-bold mb-4">
+              {/* TV Show Details */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4 flex-1">
             {tvShow?.name || "Loading..."}
           </h1>
           <BookmarkButton
@@ -161,8 +161,8 @@ export default function TVShowPage() {
           />
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 mb-8">
-          <div className="w-full lg:w-1/3 flex-1/5 h-[350px]">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 mb-6 sm:mb-8">
+          <div className="w-full lg:w-1/3 flex-1/5 h-[250px] sm:h-[350px] max-w-sm mx-auto lg:mx-0">
             <Image
               src={`https://image.tmdb.org/t/p/w500${tvShow?.poster_path}`}
               alt={tvShow?.name || "TV Show poster"}
@@ -177,14 +177,14 @@ export default function TVShowPage() {
               {tvShow?.genres?.map((genre) => (
                 <span
                   key={genre.id}
-                  className="border rounded-full px-3 py-1 text-sm"
+                  className="border rounded-full px-2 sm:px-3 py-1 text-xs sm:text-sm"
                 >
                   {genre.name}
                 </span>
               ))}
             </div>
 
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 text-sm sm:text-base">
               {tvShow?.overview?.slice(0, 250) ||
                 "Loading TV show description..."}
             </p>
@@ -218,7 +218,7 @@ export default function TVShowPage() {
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
               {isPlayingTrailer && selectedTrailer ? (
-                <div className="relative w-full h-[380px] rounded-xl overflow-hidden">
+                <div className="relative w-full h-[250px] sm:h-[380px] rounded-xl overflow-hidden">
                   <iframe
                     src={`https://www.youtube.com/embed/${selectedTrailer}?autoplay=1&rel=0`}
                     title="Trailer"
@@ -234,7 +234,7 @@ export default function TVShowPage() {
                   </button>
                 </div>
               ) : (
-                <div className="relative w-full h-[350px]">
+                <div className="relative w-full h-[250px] sm:h-[350px]">
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${tvShow?.backdrop_path}`}
                     alt="TV Show Backdrop"
