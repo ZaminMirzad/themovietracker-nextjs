@@ -61,7 +61,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-2">
-            <h1 className="text-4xl font-bold text-light-foreground dark:text-dark-foreground">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
               The <br /> Movie <br /> Tracker
             </h1>
           </Link>
@@ -119,10 +119,10 @@ export default function Header() {
             <SignedIn>
               <Link
                 href="/bookmarks"
-                className="text-light-input-background cursor-pointer hover:text-white dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
+                className="group relative p-2 rounded-xl transition-all duration-300 bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-500/20 hover:border-red-500/40 backdrop-blur-sm"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-6 h-6 text-red-500 group-hover:text-red-600 transition-colors duration-200"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

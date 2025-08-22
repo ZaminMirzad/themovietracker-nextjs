@@ -8,7 +8,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-light-foreground dark:text-dark-foreground mt-16">
+    <footer className="bg-light-background dark:bg-dark-background text-light-foreground dark:text-dark-foreground mt-16 border-t border-light-border dark:border-dark-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -20,11 +20,11 @@ const Footer = () => {
                 MovieTracker
               </span>
             </div>
-            <p className=" mb-4 max-w-md">
+            <p className="text-light-input-text dark:text-dark-input-text mb-4 max-w-md">
               Discover, track, and share your favorite movies and TV shows.
               Built with modern technology and passion for cinema.
             </p>
-            <div className="flex items-center space-x-1 text-sm text-gray-400">
+            <div className="flex items-center space-x-1 text-sm text-light-input-text dark:text-dark-input-text opacity-70">
               <Heart className="h-4 w-4 text-red-500" />
               <span>Made with love by Zamin Mirzad</span>
             </div>
@@ -37,7 +37,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   Home
                 </Link>
@@ -45,7 +45,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/movie/popular"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   Popular Movies
                 </Link>
@@ -53,7 +53,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/tv/popular"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   Popular TV Shows
                 </Link>
@@ -61,7 +61,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/search"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   Search
                 </Link>
@@ -71,14 +71,14 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Resources</h3>
+            <h3 className="text-lg font-semibold mb-4 text-light-foreground dark:text-dark-foreground">Resources</h3>
             <ul className="space-y-2">
               <li>
                 <a
                   href="https://www.themoviedb.org/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   TMDb API
                 </a>
@@ -86,7 +86,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   About
                 </Link>
@@ -94,7 +94,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/privacy"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -102,7 +102,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/terms"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
                 >
                   Terms of Service
                 </Link>
@@ -112,14 +112,14 @@ const Footer = () => {
         </div>
 
         {/* Social Links */}
-        <div className="border-t border-gray-800 mt-8 pt-8">
+        <div className="border-t border-light-border dark:border-dark-border mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex space-x-6 mb-4 md:mb-0">
               <a
                 href="https://github.com/ZaminMirzad"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
               >
                 <Github className="h-6 w-6" />
               </a>
@@ -127,7 +127,7 @@ const Footer = () => {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
               >
                 <X className="h-6 w-6" />
               </a>
@@ -135,13 +135,13 @@ const Footer = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-light-input-text dark:text-dark-input-text hover:text-light-accent dark:hover:text-dark-accent transition-colors"
               >
                 <Instagram className="h-6 w-6" />
               </a>
             </div>
 
-            <p className="text-gray-400 text-sm">
+            <p className="text-light-input-text dark:text-dark-input-text text-sm">
               © {currentYear} MovieTracker. All rights reserved.
             </p>
           </div>
