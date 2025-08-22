@@ -1,20 +1,23 @@
 "use client";
 
-import { useAppStore } from "@/store/useStore";
-import { db } from "@/lib/instantdb";
 import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAppStore } from "@/store/useStore";
+import { useEffect } from "react";
 
 export default function BookmarksPage() {
-
-  const { isLoading, error, data } = db.useQuery({ bookmarks: {} });
-  const { bookmarks: localBookmarks } = useAppStore();
   const router = useRouter();
   const { user } = useUser();
-  
+  const { bookmarks, fetchBookmarks} = useAppStore(state => state);
+  // const { data } = db.useQuery({ bookmarks: {} });
+
+  useEffect(() => {
+    fetchBookmarks();
+  }, [fetchBookmarks]);
+
   const handleClick = (id: string | number, mediaType: "movie" | "tv") => {
     if (mediaType === "tv") {
       router.push(`/tv/${id}`);
@@ -28,10 +31,10 @@ export default function BookmarksPage() {
       <SignedOut>
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-white mb-4">
+            <h1 className="text-3xl font-bold text-light-foreground dark:text-dark-foreground mb-4">
               Sign in to view your bookmarks
             </h1>
-            <p className="text-gray-400 mb-8">
+            <p className="text-light-input-text dark:text-dark-input-text mb-8">
               You need to be signed in to access your bookmarks.
             </p>
             <SignInButton mode="modal">
@@ -46,14 +49,16 @@ export default function BookmarksPage() {
       <SignedIn>
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">My Bookmarks</h1>
-            <p className="text-gray-400">
+            <h1 className="text-3xl font-bold text-light-foreground dark:text-dark-foreground mb-2">
+              My Bookmarks
+            </h1>
+            <p className="text-light-input-text dark:text-dark-input-text">
               Welcome back, {user?.fullName || user?.username}! You have{" "}
-            {data?.bookmarks?.length || 0} bookmarked items.
+              {bookmarks?.length} bookmarked items.
             </p>
           </div>
 
-          {data?.bookmarks?.length === 0 ? (
+          {bookmarks?.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-24 h-24 mx-auto mb-6 text-gray-500">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,11 +86,18 @@ export default function BookmarksPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {data?.bookmarks?.map((bookmark, index) => (
+              {bookmarks?.map((bookmark, index) => (
                 <motion.div
                   key={`${bookmark.movieId}-${bookmark.media_type}`}
                   className="bg-light-input-background text-light-input-text rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 cursor-pointer group"
-                  onClick={() => handleClick(bookmark.movieId, bookmark.media_type as "movie" | "tv")}
+                  onClick={() => {
+                    if (bookmark.movieId !== undefined && bookmark.media_type) {
+                      handleClick(
+                        bookmark.movieId,
+                        bookmark.media_type as "movie" | "tv",
+                      );
+                    }
+                  }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -100,7 +112,7 @@ export default function BookmarksPage() {
                       alt={bookmark.title || "No title"}
                       width={300}
                       height={450}
-                      className="w-full h-auto object-cover h-auto"
+                      className="w-full h-auto object-cover"
                     />
                     <div className="absolute top-2 right-2">
                       <span

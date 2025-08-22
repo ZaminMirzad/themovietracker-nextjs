@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.30.0",
+    "@instantdb/admin": "^0.21.0",
     "@instantdb/react": "^0.20.21",
     "lucide-react": "^0.537.0",
     "motion": "^12.23.12",
@@ -27,6 +28,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "prettier": "3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

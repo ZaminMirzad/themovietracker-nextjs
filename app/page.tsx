@@ -1,22 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FilteringTabs from "@/components/filteringTabs";
 import { useRouter } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
-import { db } from "@/lib/instantdb";
-import { useAppStore } from "@/store/useStore"
+import { useAppStore } from "@/store/useStore";
 
+interface MediaItem {
+  id: string | number;
+  movieId?: string | number;
+  backdrop_path?: string;
+  title?: string;
+  name?: string;
+  rating?: number;
+  media_type?: string;
+  first_air_date?: string;
+}
 
 export default function Home() {
   const router = useRouter();
-  
+
   // Get data and functions from store
-  const { movieData, fetchMovieData, setBookmarks } = useAppStore();
-  const { weekTrending, popular, upcoming, popularTV, topRatedTV, isLoading } = movieData;
+  const { movieData, fetchMovieData, fetchBookmarks } = useAppStore();
+  const { weekTrending, popular, upcoming, popularTV, topRatedTV, isLoading } =
+    movieData;
 
   const [activeTab, setActiveTab] = useState<
     "all" | "currently" | "suggested" | "previously" | "tv"
@@ -25,27 +33,11 @@ export default function Home() {
   // Fetch movie data on component mount
   useEffect(() => {
     fetchMovieData();
-  }, [fetchMovieData]);
-
-  const handleSearchModalItemClick = (id: string | number) => {
-    router.push(`/movie/${id}`);
-  };
-
-  // Handle bookmarks from database
-  const { data } = db.useQuery({ bookmarks: {} });
-  useEffect(() => {
-    if (data?.bookmarks) {
-      // Ensure each bookmark has a movieId property as required by IBookmark
-      const bookmarksWithMovieId = data.bookmarks.map((bookmark: any) => ({
-        ...bookmark,
-        movieId: bookmark.movieId ?? bookmark.id,
-      }));
-      setBookmarks(bookmarksWithMovieId);
-    }
-  }, [data?.bookmarks, setBookmarks]);
+    fetchBookmarks();
+  }, []);
 
   // render sections
-  const renderSection = (title: string, items: any[]) => (
+  const renderSection = (title: string, items: MediaItem[]) => (
     <div className="mb-8">
       <h2 className="text-lg mb-3">{title}</h2>
       <div className="flex gap-4 overflow-hidden flex-wrap p-2">
@@ -62,8 +54,10 @@ export default function Home() {
               const src = typeof item === "string" ? item : item.backdrop_path;
               const rating = typeof item === "object" && item.rating;
               const title = item.title || item.name;
-              const isTV = item.media_type === 'tv' || item.first_air_date;
-              
+              const isTV = Boolean(
+                item.media_type === "tv" || item.first_air_date,
+              );
+
               return (
                 <motion.div
                   key={idx}
@@ -75,12 +69,16 @@ export default function Home() {
                   onClick={() => handleClick(item.id, isTV)}
                 >
                   <Image
-                    src={process.env.NEXT_PUBLIC_IMAGE_BASE_URL + src}
-                    alt={title}
+                    src={
+                      (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || "") +
+                      (src || "")
+                    }
+                    alt={title || "Image"}
+                    loading={"lazy"}
                     width={130}
                     height={70}
-                    
-                    className="rounded-lg object-cover overflow-hidden w-auto"
+                    style={{ width: "auto", height: "auto" }}
+                    className="rounded-lg object-cover overflow-hidden w-auto h-auto"
                   />
                   {rating && (
                     <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
@@ -109,7 +107,7 @@ export default function Home() {
       router.push(`/movie/${id}`);
     }
   }
-  
+
   // Show loading state
   if (isLoading && !weekTrending) {
     return (
@@ -153,18 +151,6 @@ export default function Home() {
           {renderSection("Top Rated TV Shows", topRatedTV?.results || [])}
         </>
       )}
-
-      {/* navigation links */}
-      <nav>
-        {/* Prefetched when the link is hovered or enters the viewport */}
-        <Link href="/login">Login</Link>
-        <Link href="/signup">Sign Up</Link>
-      </nav>
-
-      {/* built with love by */}
-      <p className="text-sm text-gray-400 place-self-end ">
-        Built with <span className="text-red-500">❤️</span> by Zamin Mirzad
-      </p>
     </main>
   );
 }

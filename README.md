@@ -13,14 +13,18 @@ A Next.js application for tracking movies and TV shows with a global search func
 ## Architecture
 
 ### Global Header
+
 The header component (`components/header.tsx`) is included in the root layout (`app/layout.tsx`) and provides:
+
 - Search input with real-time search
 - Clear search functionality
 - Focus/blur handling
 - Integration with Zustand store
 
 ### Zustand Store
+
 The store (`store/useStore.ts`) manages:
+
 - Search state (query, results, loading)
 - Modal visibility
 - Input focus state
@@ -28,6 +32,7 @@ The store (`store/useStore.ts`) manages:
 - Search handlers with debouncing
 
 ### Search Flow
+
 1. User types in the search input
 2. Input is debounced (400ms delay)
 3. API call is made to TMDB
@@ -46,11 +51,13 @@ The store (`store/useStore.ts`) manages:
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Set up environment variables:
+
 ```env
 NEXT_PUBLIC_API_KEY=your_tmdb_api_key
 NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
@@ -65,6 +72,7 @@ INSTANTDB_ADMIN_KEY=...
 ```
 
 3. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -74,12 +82,12 @@ npm run dev
 The Zustand store can be configured to set default pages and other app-wide settings:
 
 ```typescript
-import { useAppStore } from '@/store/useStore';
+import { useAppStore } from "@/store/useStore";
 
 const { setDefaultPage, defaultPage } = useAppStore();
 
 // Set default page
-setDefaultPage('/movie/123');
+setDefaultPage("/movie/123");
 
 // Navigate to default page
 navigateToDefault();
@@ -88,6 +96,7 @@ navigateToDefault();
 ## Search Functionality
 
 The search is handled entirely through the Zustand store:
+
 - Debounced API calls (400ms)
 - Error handling
 - Loading states

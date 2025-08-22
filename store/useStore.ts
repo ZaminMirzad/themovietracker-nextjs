@@ -1,7 +1,26 @@
 import { create } from "zustand";
 import { RefObject } from "react";
-import { auth, currentUser } from '@clerk/nextjs/server';
 
+/*
+ * MovieTracker Store with InstantDB Synchronization
+ *
+ * To initialize the store and sync with InstantDB when your app starts:
+ *
+ * In your main layout or app component:
+ * ```tsx
+ * import { useAppStore } from '@/store/useStore';
+ *
+ * useEffect(() => {
+ *   useAppStore.getState().initializeStore();
+ * }, []);
+ * }
+ * ```
+ *
+ * This will:
+ * 1. Sync bookmarks from InstantDB
+ * 2. Fetch initial movie data
+ * 3. Ensure bookmarks are properly synchronized
+ */
 
 interface ISearchResult {
   id: string | number;
@@ -13,12 +32,14 @@ interface ISearchResult {
 }
 
 interface IBookmark {
+  id: string | number;
   movieId: string | number;
   title: string;
+  overview?: string;
   poster_path?: string;
   backdrop_path?: string;
-  media_type: 'movie' | 'tv';
-  // added_at: string;
+  media_type: "movie" | "tv";
+  added_at?: string;
 }
 
 interface ITrendingResult {
@@ -48,7 +69,8 @@ interface IMovieData {
 }
 
 interface IMovieDetails {
-  id?: number;
+  id?: number | string;
+  movieId?: number | string;
   poster_path?: string;
   backdrop_path?: string;
   title?: string;
@@ -62,11 +84,16 @@ interface IMovieDetails {
   revenue?: number;
   status?: string;
   tagline?: string;
-  production_companies?: Array<{ id: number; name: string; logo_path?: string }>;
+  production_companies?: Array<{
+    id: number;
+    name: string;
+    logo_path?: string;
+  }>;
 }
 
 interface ITVDetails {
-  id?: number;
+  id?: number | string;
+  movieId?: number | string;
   poster_path?: string;
   backdrop_path?: string;
   name?: string;
@@ -125,31 +152,31 @@ interface IDetailPageData {
   lastFetched: number | null;
   isLoading: boolean;
   currentId: string | null;
-  currentType: 'movie' | 'tv' | null;
+  currentType: "movie" | "tv" | null;
 }
 
 interface IAppState {
-  // Search functionality
+  // Search state
   search: string;
-  setSearch: (val: string) => void;
-  isInputFocused: boolean;
-  setIsInputFocused: (val: boolean) => void;
-  showModal: boolean;
-  setShowModal: (val: boolean) => void;
   searchResults: ISearchResult[] | null;
-  setSearchResults: (results: ISearchResult[] | null) => void;
   isSearching: boolean;
-  setIsSearching: (val: boolean) => void;
+  showModal: boolean;
   inputRef: RefObject<HTMLInputElement | null>;
-  setInputRef: (ref: RefObject<HTMLInputElement | null>) => void;
-  user:{
-    userId:string,
-    userName:string
-  }
-
-  // Default page configuration
   defaultPage: string;
+
+  // Search actions
+  setSearch: (search: string) => void;
+  setSearchResults: (results: ISearchResult[] | null) => void;
+  setIsSearching: (isSearching: boolean) => void;
+  setShowModal: (show: boolean) => void;
+  setInputRef: (ref: RefObject<HTMLInputElement | null>) => void;
   setDefaultPage: (page: string) => void;
+
+  // User state
+  user: {
+    userId: string;
+    userName: string;
+  };
 
   // Movie/TV Data
   movieData: IMovieData;
@@ -166,25 +193,25 @@ interface IAppState {
 
   // Bookmarks
   bookmarks: IBookmark[];
-  addBookmark: (bookmark: IBookmark) => void;
-  removeBookmark: (id: string | number, mediaType: 'movie' | 'tv') => void;
-  isBookmarked: (id: string | number, mediaType: 'movie' | 'tv') => boolean;
   setBookmarks: (bookmarks: IBookmark[]) => void;
+  addToBookmark: (bookmark: IBookmark) => void;
+  removeBookmark: (id: string | number) => void;
+  fetchBookmarks: () => Promise<void>;
 
-  // Search handlers
+  // Search functionality
   handleSearch: (query: string) => Promise<void>;
   clearSearch: () => void;
-
-  // Navigation helper
   navigateToDefault: () => void;
+
+  // Store initialization
+  initializeStore: () => Promise<void>;
 }
 
+// useAppStore
 export const useAppStore = create<IAppState>((set, get) => ({
   // Search state
   search: "",
   setSearch: (val) => set({ search: val }),
-  isInputFocused: false,
-  setIsInputFocused: (val) => set({ isInputFocused: val }),
   showModal: false,
   setShowModal: (val) => set({ showModal: val }),
   searchResults: null,
@@ -193,9 +220,16 @@ export const useAppStore = create<IAppState>((set, get) => ({
   setIsSearching: (val) => set({ isSearching: val }),
   inputRef: { current: null },
   setInputRef: (ref) => set({ inputRef: ref }),
-  user:{
-    userId:"",
-    userName:""
+  user: {
+    userId: "",
+    userName: "",
+  },
+
+  // Bookmarks state first update every 1 hour then check local storage for updates if no new updates then use local storage
+  bookmarks: [],
+  setBookmarks: (bookmarks: IBookmark[]) => {
+    set({ bookmarks });
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
   },
 
   // Default page configuration
@@ -212,69 +246,70 @@ export const useAppStore = create<IAppState>((set, get) => ({
     lastFetched: null,
     isLoading: false,
   },
+
+  // set movie data
   setMovieData: (data) => {
     const state = get();
-    set({ 
-      movieData: { 
-        ...state.movieData, 
+    set({
+      movieData: {
+        ...state.movieData,
         ...data,
-        lastFetched: Date.now()
-      } 
+        lastFetched: Date.now(),
+      },
     });
   },
+
+  // fetch movie data
   fetchMovieData: async () => {
     const state = get();
     const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-    
+
     // Check if data is still fresh
-    if (state.movieData.lastFetched && 
-        Date.now() - state.movieData.lastFetched < CACHE_DURATION &&
-        state.movieData.weekTrending) {
+    if (
+      state.movieData.lastFetched &&
+      Date.now() - state.movieData.lastFetched < CACHE_DURATION &&
+      state.movieData.weekTrending
+    ) {
       return; // Data is still fresh, no need to refetch
     }
 
     state.setMovieData({ isLoading: true });
-    
+
     try {
-      const [trendingRes, popularRes, upcomingRes, popularTVRes, topRatedTVRes] = await Promise.all([
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/trending/all/week?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/movie/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/tv/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/tv/top_rated?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-      ]);
-      
-      const [trendingData, popularData, upcomingData, popularTVData, topRatedTVData] = await Promise.all([
-        trendingRes.json(),
-        popularRes.json(),
-        upcomingRes.json(),
-        popularTVRes.json(),
-        topRatedTVRes.json(),
-      ]);
-      
+      const [weekTrending, popular, upcoming, popularTV, topRatedTV] =
+        await Promise.all([
+          fetch(
+            `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/tv/popular?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/tv/top_rated?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ).then((res) => res.json()),
+        ]);
+
       state.setMovieData({
-        weekTrending: trendingData,
-        popular: popularData,
-        upcoming: upcomingData,
-        popularTV: popularTVData,
-        topRatedTV: topRatedTVData,
+        weekTrending,
+        popular,
+        upcoming,
+        popularTV,
+        topRatedTV,
         isLoading: false,
       });
     } catch (error) {
-      console.error('Error fetching movie data:', error);
+      console.error("Error fetching movie data:", error);
       state.setMovieData({ isLoading: false });
     }
   },
+
+  // clear movie data
   clearMovieData: () => {
     set({
       movieData: {
@@ -285,7 +320,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
         topRatedTV: null,
         lastFetched: null,
         isLoading: false,
-      }
+      },
     });
   },
 
@@ -307,56 +342,69 @@ export const useAppStore = create<IAppState>((set, get) => ({
   },
   setDetailPageData: (data) => {
     const state = get();
-    set({ 
-      detailPageData: { 
-        ...state.detailPageData, 
+    set({
+      detailPageData: {
+        ...state.detailPageData,
         ...data,
-        lastFetched: Date.now()
-      } 
+        lastFetched: Date.now(),
+      },
     });
   },
+
+  // fetch movie details
   fetchMovieDetails: async (id: string) => {
     const state = get();
     const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for detail pages
-    
+
     // Check if data is still fresh for the same movie
-    if (state.detailPageData.currentId === id && 
-        state.detailPageData.currentType === 'movie' &&
-        state.detailPageData.lastFetched && 
-        Date.now() - state.detailPageData.lastFetched < CACHE_DURATION &&
-        state.detailPageData.movie) {
+    if (
+      state.detailPageData.currentId === id &&
+      state.detailPageData.currentType === "movie" &&
+      state.detailPageData.lastFetched &&
+      Date.now() - state.detailPageData.lastFetched < CACHE_DURATION &&
+      state.detailPageData.movie
+    ) {
       return; // Data is still fresh, no need to refetch
     }
 
-    state.setDetailPageData({ isLoading: true, currentId: id, currentType: 'movie' });
-    
+    state.setDetailPageData({
+      isLoading: true,
+      currentId: id,
+      currentType: "movie",
+    });
+
     try {
-      const [movieRes, creditsRes, relatedRes, trailersRes] = await Promise.all([
-        fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `https://api.themoviedb.org/3/movie/${id}/similar?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-        fetch(
-          `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        ),
-      ]);
-      
-      const [movieData, creditsData, relatedData, trailersData] = await Promise.all([
-        movieRes.json(),
-        creditsRes.json(),
-        relatedRes.json(),
-        trailersRes.json(),
-      ]);
-      
-      const officialTrailers = trailersData.results?.filter(
-        (trailer: ITrailer) => trailer.type === "Trailer" && trailer.site === "YouTube"
-      ) || [];
-      
+      const [movieRes, creditsRes, relatedRes, trailersRes] = await Promise.all(
+        [
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}/similar?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ),
+        ]
+      );
+
+      const [movieData, creditsData, relatedData, trailersData] =
+        await Promise.all([
+          movieRes.json(),
+          creditsRes.json(),
+          relatedRes.json(),
+          trailersRes.json(),
+        ]);
+
+      const officialTrailers =
+        trailersData.results?.filter(
+          (trailer: ITrailer) =>
+            trailer.type === "Trailer" && trailer.site === "YouTube"
+        ) || [];
+
       state.setDetailPageData({
         movie: movieData,
         cast: creditsData.cast || [],
@@ -370,31 +418,39 @@ export const useAppStore = create<IAppState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.error('Error fetching movie details:', error);
+      console.error("Error fetching movie details:", error);
       state.setDetailPageData({ isLoading: false });
     }
   },
+
+  // fetch tv details
   fetchTVDetails: async (id: string) => {
     const state = get();
     const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for detail pages
-    
+
     // Check if data is still fresh for the same TV show
-    if (state.detailPageData.currentId === id && 
-        state.detailPageData.currentType === 'tv' &&
-        state.detailPageData.lastFetched && 
-        Date.now() - state.detailPageData.lastFetched < CACHE_DURATION &&
-        state.detailPageData.tvShow) {
+    if (
+      state.detailPageData.currentId === id &&
+      state.detailPageData.currentType === "tv" &&
+      state.detailPageData.lastFetched &&
+      Date.now() - state.detailPageData.lastFetched < CACHE_DURATION &&
+      state.detailPageData.tvShow
+    ) {
       return; // Data is still fresh, no need to refetch
     }
 
-    state.setDetailPageData({ isLoading: true, currentId: id, currentType: 'tv' });
-    
+    state.setDetailPageData({
+      isLoading: true,
+      currentId: id,
+      currentType: "tv",
+    });
+
     try {
       const tvRes = await fetch(
         `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
       );
       const tvData = await tvRes.json();
-      
+
       // Fetch all seasons data
       const seasonsData = [];
       if (tvData.number_of_seasons) {
@@ -406,7 +462,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
           seasonsData.push(seasonData);
         }
       }
-      
+
       // Fetch trailers and related shows
       const [trailersRes, relatedRes] = await Promise.all([
         fetch(
@@ -416,16 +472,18 @@ export const useAppStore = create<IAppState>((set, get) => ({
           `https://api.themoviedb.org/3/tv/${id}/similar?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
         ),
       ]);
-      
+
       const [trailersData, relatedData] = await Promise.all([
         trailersRes.json(),
         relatedRes.json(),
       ]);
-      
-      const officialTrailers = trailersData.results?.filter(
-        (trailer: ITrailer) => trailer.type === "Trailer" && trailer.site === "YouTube"
-      ) || [];
-      
+
+      const officialTrailers =
+        trailersData.results?.filter(
+          (trailer: ITrailer) =>
+            trailer.type === "Trailer" && trailer.site === "YouTube"
+        ) || [];
+
       state.setDetailPageData({
         tvShow: tvData,
         seasons: seasonsData,
@@ -439,10 +497,12 @@ export const useAppStore = create<IAppState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.error('Error fetching TV details:', error);
+      console.error("Error fetching TV details:", error);
       state.setDetailPageData({ isLoading: false });
     }
   },
+
+  // clear detail page data
   clearDetailPageData: () => {
     set({
       detailPageData: {
@@ -459,96 +519,93 @@ export const useAppStore = create<IAppState>((set, get) => ({
         isLoading: false,
         currentId: null,
         currentType: null,
-      }
+      },
     });
   },
 
-  // Bookmarks state
-  bookmarks: (() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('bookmarks');
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  })(),
-  setBookmarks: (bookmarks) => set({ bookmarks }),
-  addBookmark: (bookmark) => {
-    const state = get();
-    const exists = state.bookmarks.find(
-      b => b.movieId === bookmark.movieId && b.media_type === bookmark.media_type
-    );
-    if (!exists) {
-      const updated = [...state.bookmarks, bookmark];
-      set({ bookmarks: updated });
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('bookmarks', JSON.stringify(updated));
-        
-        // Sync with InstantDB
-        import('@/lib/instantdb').then(({ db }) => {
-          import('@instantdb/react').then(({ id }) => {
-            db.transact(
-              db.tx.bookmarks[id()].create({
-                movieId: bookmark.movieId,
-                title: bookmark.title,
-                poster_path: bookmark.poster_path,
-                backdrop_path: bookmark.backdrop_path,
-                media_type: bookmark.media_type,
-              })
-            );
-          });
-        }).catch(err => console.error('Error adding bookmark to InstantDB:', err));
-      }
-    }
-  },
-  removeBookmark: (id, mediaType) => {
-    const state = get();
-    const filtered = state.bookmarks.filter(
-      b => !(b.movieId === id && b.media_type === mediaType)
-    );
-    set({ bookmarks: filtered });
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bookmarks', JSON.stringify(filtered));
-      
-      // Remove from InstantDB
-      import('@/lib/instantdb').then(({ db }) => {
-        import('@instantdb/react').then(({ id }) => {
-          db.transact(db.tx.bookmarks[id.toString()].delete());
-        });
-      }).catch(err => console.error('Error removing bookmark from InstantDB:', err));
-    }
-  },
-  syncWithInstantDB: async () => {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      // This would sync bookmarks from InstantDB
-      // Implementation depends on your InstantDB setup
-    } catch (error) {
-      console.error('Error syncing with InstantDB:', error);
-    }
-  },
-  isBookmarked: (id, mediaType) => {
-    const state = get();
-    return state.bookmarks.some(
-      b => b.movieId === id && b.media_type === mediaType
-    );
+  // fetch bookmarks and set to store bookmarks and update react state
+  fetchBookmarks: async () => {
+    const response = await fetch("/api/bookmarks");
+    const data = await response.json();
+    set({ bookmarks: data?.bookmarks || [] });
+    // save to local storage
+    localStorage.setItem("bookmarks", JSON.stringify(data?.bookmarks || []));
   },
 
+  // add to instantdb bookmark
+  addToBookmark: async (bookmark: IBookmark) => {
+    try {
+      const response = await fetch("/api/bookmarks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookmark }),
+      });
+      const data = await response.json();
+
+      if (data?.bookmarks) {
+        // Update store state with new bookmarks
+        set({ bookmarks: data.bookmarks });
+        // Update local storage
+        localStorage.setItem("bookmarks", JSON.stringify(data.bookmarks));
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error adding bookmark:", error);
+      throw error;
+    }
+  },
+
+  // remove bookmark
+  removeBookmark: async (id: string | number) => {
+    try {
+      const response = await fetch("/api/bookmarks", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookmark: { id: id } }),
+      });
+
+      const data = await response.json();
+
+      if (data?.bookmarks) {
+        // Update store state with new bookmarks
+        set({ bookmarks: data.bookmarks });
+        // Update local storage
+        localStorage.setItem("bookmarks", JSON.stringify(data.bookmarks));
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error removing bookmark:", error);
+      throw error;
+    }
+  },
+
+  // Search state
   handleSearch: async (query: string) => {
     const state = get();
     if (!query.trim()) {
       state.setSearchResults(null);
+      state.setIsSearching(false);
+      state.setShowModal(false);
       return;
     }
     state.setIsSearching(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_TMDB_BASE_URL}/search/multi?api_key=${
+        `https://api.themoviedb.org/3/search/multi?api_key=${
           process.env.NEXT_PUBLIC_API_KEY
         }&query=${encodeURIComponent(query)}`
       );
       const data = await res.json();
       state.setSearchResults(data.results || []);
+      if (data.results && data.results.length > 0) {
+        state.setShowModal(true);
+      }
     } catch (error) {
       console.error("Search error:", error);
       state.setSearchResults(null);
@@ -571,19 +628,28 @@ export const useAppStore = create<IAppState>((set, get) => ({
       window.location.href = state.defaultPage;
     }
   },
+
+  // Store initialization
+  initializeStore: async () => {
+    const state = get();
+    // Only fetch movie data on initialization, bookmarks will be fetched when needed
+    await state.fetchMovieData();
+    // You might want to fetch other initial data here if needed
+    await state.fetchBookmarks();
+  },
 }));
 
-export type { 
-  IAppState, 
-  ISearchResult, 
-  ITrendingResult, 
-  ITrendingData, 
+export type {
+  IAppState,
+  ISearchResult,
+  ITrendingResult,
+  ITrendingData,
   IMovieData,
   IMovieDetails,
   ITVDetails,
   ICast,
   ICrew,
   ITrailer,
-  IDetailPageData
+  IDetailPageData,
 };
 export default useAppStore;

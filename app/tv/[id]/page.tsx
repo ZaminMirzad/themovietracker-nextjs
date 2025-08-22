@@ -1,18 +1,21 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import EpisodeDetailModal from "@/components/episodeDetailModal";
 import BookmarkButton from "@/components/bookmarkButton";
+import Rating from "@/components/Rating";
+import { filterAndLimitMedia } from "@/lib/mediaFilters";
+import { tvApi, dataUtils } from "@/lib/apiService";
 
 export default function TVShowPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  
+
   type TVShow = {
-    id?: number;
+    id?: string | number;
     poster_path?: string;
     backdrop_path?: string;
     name?: string;
@@ -51,9 +54,18 @@ export default function TVShowPage() {
     vote_average?: number;
     runtime?: number;
   };
-  
+
+  type Season = {
+    id: number;
+    name: string;
+    overview: string;
+    poster_path?: string;
+    season_number: number;
+    episodes: Episode[];
+  };
+
   const [tvShow, setTvShow] = useState<TVShow | null>(null);
-  const [seasons, setSeasons] = useState<any[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [relatedShows, setRelatedShows] = useState<RelatedShow[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
@@ -66,73 +78,51 @@ export default function TVShowPage() {
 
   useEffect(() => {
     async function fetchTVShow() {
+      if (!id) return;
+
       try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+        const [tvData, trailersData, relatedData] = (await Promise.all([
+          tvApi.getDetails(id),
+          tvApi.getTrailers(id),
+          tvApi.getRelated(id),
+        ])) as [TVShow, any, any];
+
+        setTvShow(tvData);
+        setTrailers(dataUtils.processTrailers((trailersData as any).results));
+        setRelatedShows(
+          dataUtils.processRelatedMedia((relatedData as any).results),
         );
-        const data = await res.json();
-        setTvShow(data);
-        
-        // Fetch all seasons data
-        if (data.number_of_seasons) {
-          const seasonsData = [];
-          for (let i = 1; i <= data.number_of_seasons; i++) {
-            const seasonRes = await fetch(
-              `https://api.themoviedb.org/3/tv/${id}/season/${i}?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-            );
-            const seasonData = await seasonRes.json();
-            seasonsData.push(seasonData);
+
+        if (
+          dataUtils.processTrailers((trailersData as any).results).length > 0
+        ) {
+          setSelectedTrailer(
+            dataUtils.processTrailers((trailersData as any).results)[0].key,
+          );
+        }
+
+        // Fetch seasons data
+        if (tvData.number_of_seasons) {
+          const seasonsData: Season[] = [];
+          for (let i = 1; i <= tvData.number_of_seasons; i++) {
+            const seasonData = await tvApi.getSeason(id, i);
+            seasonsData.push(seasonData as Season);
           }
           setSeasons(seasonsData);
         }
-
-        // Fetch trailers
-        const trailersRes = await fetch(
-          `https://api.themoviedb.org/3/tv/${id}/videos?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        );
-        const trailersData = await trailersRes.json();
-        const officialTrailers = trailersData.results?.filter(
-          (trailer: Trailer) => trailer.type === "Trailer" && trailer.site === "YouTube"
-        ) || [];
-        setTrailers(officialTrailers);
-        if (officialTrailers.length > 0) {
-          setSelectedTrailer(officialTrailers[0].key);
-        }
-
-        // Fetch related shows
-        const relatedRes = await fetch(
-          `https://api.themoviedb.org/3/tv/${id}/similar?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-        );
-        const relatedData = await relatedRes.json();
-        setRelatedShows(relatedData.results || []);
       } catch (error) {
         console.error("Error fetching TV show:", error);
       }
     }
-    
+
     if (id) {
       fetchTVShow();
     }
   }, [id]);
 
-  const fetchEpisodeTrailers = async (episodeId: number) => {
-    try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/tv/${id}/season/${selectedSeason}/episode/${episodeId}/videos?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
-      );
-      const data = await res.json();
-      const officialTrailers = data.results?.filter(
-        (trailer: Trailer) => trailer.type === "Trailer" && trailer.site === "YouTube"
-      ) || [];
-      setEpisodeTrailers(officialTrailers);
-    } catch (error) {
-      console.error("Error fetching episode trailers:", error);
-    }
-  };
-
-  function handleClick(id: string | number) {
+  const handleClick = (id: string | number) => {
     router.push(`/tv/${id}`);
-  }
+  };
 
   const handlePlayTrailer = () => {
     if (trailers.length > 0) {
@@ -144,23 +134,14 @@ export default function TVShowPage() {
     setIsPlayingTrailer(false);
   };
 
-  const handleEpisodeClick = async (episode: Episode) => {
+  const handleEpisodeClick = (episode: Episode) => {
     setSelectedEpisode(episode);
     setShowEpisodeModal(true);
-    await fetchEpisodeTrailers(episode.episode_number);
   };
 
-  const handlePlayEpisodeTrailer = () => {
-    if (episodeTrailers.length > 0) {
-      setIsPlayingEpisodeTrailer(true);
-    }
-  };
-
-  const handlePauseEpisodeTrailer = () => {
-    setIsPlayingEpisodeTrailer(false);
-  };
-
-  const currentSeason = seasons.find(season => season.season_number === selectedSeason);
+  const currentSeason = seasons.find(
+    (season) => season.season_number === selectedSeason,
+  );
 
   return (
     <main>
@@ -171,15 +152,15 @@ export default function TVShowPage() {
             {tvShow?.name || "Loading..."}
           </h1>
           <BookmarkButton
-            movieId={tvShow?.id}
-            title={tvShow?.name || ''}
+            movieId={tvShow?.id as string | number}
+            title={tvShow?.name || ""}
             poster_path={tvShow?.poster_path}
             backdrop_path={tvShow?.backdrop_path}
             media_type="tv"
-            
+            overview={tvShow?.overview}
           />
         </div>
-        
+
         <div className="flex flex-col lg:flex-row gap-8 mb-8">
           <div className="w-full lg:w-1/3 flex-1/5 h-[350px]">
             <Image
@@ -190,37 +171,50 @@ export default function TVShowPage() {
               className="rounded-xl w-full object-cover h-auto"
             />
           </div>
-          
+
           <div className="flex flex-1/5 flex-col">
             <div className="flex gap-2 mb-3 flex-wrap">
               {tvShow?.genres?.map((genre) => (
-                <span key={genre.id} className="border rounded-full px-3 py-1 text-sm">
+                <span
+                  key={genre.id}
+                  className="border rounded-full px-3 py-1 text-sm"
+                >
                   {genre.name}
                 </span>
               ))}
             </div>
-            
+
             <p className="text-gray-600 mb-4">
-              {tvShow?.overview?.slice(0, 250) || "Loading TV show description..."}
+              {tvShow?.overview?.slice(0, 250) ||
+                "Loading TV show description..."}
             </p>
-            
+
             <div className="space-y-2 mb-4">
-              <p className="text-sm text-gray-500">Status: <span className="font-medium">{tvShow?.status}</span></p>
-              <p className="text-sm text-gray-500">First Air Date: <span className="font-medium">{tvShow?.first_air_date}</span></p>
-              <p className="text-sm text-gray-500">Seasons: <span className="font-medium">{tvShow?.number_of_seasons}</span></p>
-              <p className="text-sm text-gray-500">Episodes: <span className="font-medium">{tvShow?.number_of_episodes}</span></p>
+              <p className="text-sm text-gray-500">
+                Status: <span className="font-medium">{tvShow?.status}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                First Air Date:{" "}
+                <span className="font-medium">{tvShow?.first_air_date}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Seasons:{" "}
+                <span className="font-medium">{tvShow?.number_of_seasons}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Episodes:{" "}
+                <span className="font-medium">
+                  {tvShow?.number_of_episodes}
+                </span>
+              </p>
             </div>
-            
+
             <p className="text-sm text-gray-500 mb-2">IMDB Rating</p>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-yellow-400 text-lg">★</span>
-              <span className="font-medium text-sm">
-                {tvShow?.vote_average?.toFixed(1) || "0.0"}/10
-              </span>
-              <span className="text-gray-500 text-sm">8k Reviews</span>
+              <Rating rating={tvShow?.vote_average || 0} />
             </div>
           </div>
-          
+
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
               {isPlayingTrailer && selectedTrailer ? (
@@ -254,12 +248,12 @@ export default function TVShowPage() {
                       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
                     >
                       <div className="bg-white bg-opacity-90 p-4 rounded-full group-hover:scale-110 transition-transform">
-                        <svg 
-                          className="w-8 h-8 text-black ml-1" 
-                          fill="currentColor" 
+                        <svg
+                          className="w-8 h-8 text-black ml-1"
+                          fill="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path d="M8 5v14l11-7z"/>
+                          <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
                     </button>
@@ -276,11 +270,11 @@ export default function TVShowPage() {
             <h2 className="text-2xl font-bold mb-4">Seasons</h2>
             <div className="flex gap-2 mb-6 flex-wrap">
               {seasons.map((season, index) => (
-                <button 
-                  key={season.season_number} 
+                <button
+                  key={season.season_number}
                   className={`px-3 py-1 border rounded-md transition-colors ${
-                    selectedSeason === season.season_number 
-                      ? "bg-blue-500 text-white border-blue-500" 
+                    selectedSeason === season.season_number
+                      ? "bg-blue-500 text-white border-blue-500"
                       : "hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                   onClick={() => setSelectedSeason(season.season_number)}
@@ -297,7 +291,7 @@ export default function TVShowPage() {
                   Season {currentSeason.season_number} - {currentSeason.name}
                 </h3>
                 <p className="text-gray-600 mb-4">{currentSeason.overview}</p>
-                
+
                 {/* Episodes Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {currentSeason.episodes?.map((episode: any, idx: number) => (
@@ -314,9 +308,15 @@ export default function TVShowPage() {
                         className="object-cover w-full h-[120px]"
                       />
                       <div className="p-3">
-                        <h3 className="text-sm font-semibold mb-2 line-clamp-2">{episode.name}</h3>
-                        <p className="text-xs text-gray-500 mb-2">Episode {episode.episode_number}</p>
-                        <p className="text-xs text-gray-500">{episode.air_date}</p>
+                        <h3 className="text-sm font-semibold mb-2 line-clamp-2">
+                          {episode.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Episode {episode.episode_number}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {episode.air_date}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -331,7 +331,7 @@ export default function TVShowPage() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Related Shows</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {relatedShows.slice(0, 12).map((show) => (
+              {filterAndLimitMedia(relatedShows, 12).map((show) => (
                 <div
                   key={show.id}
                   className="cursor-pointer group"
@@ -347,9 +347,11 @@ export default function TVShowPage() {
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
                     {show.vote_average && (
-                      <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <div className="absolute top-2 left-2 bg-black/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md flex items-center gap-1 shadow-lg">
                         <span className="text-yellow-400">★</span>
-                        {show.vote_average.toFixed(1)}
+                        <span className="font-semibold">
+                          {show.vote_average.toFixed(1)}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -357,7 +359,7 @@ export default function TVShowPage() {
                     {show.name}
                   </div>
                   {show.first_air_date && (
-                    <div className="text-xs text-gray-500 text-center">
+                    <div className="text-xs text-gray-500/50 text-center">
                       {new Date(show.first_air_date).getFullYear()}
                     </div>
                   )}
@@ -368,102 +370,11 @@ export default function TVShowPage() {
         )}
       </div>
 
-      {/* Episode Details Modal */}
-      {showEpisodeModal && selectedEpisode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-bold">{selectedEpisode.name}</h2>
-                <button
-                  onClick={() => setShowEpisodeModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-xl"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Episode Image and Trailer */}
-                <div className="relative rounded-xl overflow-hidden">
-                  {isPlayingEpisodeTrailer && episodeTrailers.length > 0 ? (
-                    <div className="relative w-full h-[300px] rounded-xl overflow-hidden">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${episodeTrailers[0].key}?autoplay=1&rel=0`}
-                        title="Episode Trailer"
-                        className="w-full h-full rounded-xl"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                      <button
-                        onClick={handlePauseEpisodeTrailer}
-                        className="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-90 transition-colors z-10"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="relative w-full h-[300px]">
-                      <Image
-                        src={`https://image.tmdb.org/t/p/w500${selectedEpisode.still_path}`}
-                        alt={selectedEpisode.name}
-                        width={400}
-                        height={300}
-                        className="rounded-xl object-cover w-full h-auto"
-                      />
-                      {episodeTrailers.length > 0 && (
-                        <button
-                          onClick={handlePlayEpisodeTrailer}
-                          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
-                        >
-                          <div className="bg-white bg-opacity-90 p-4 rounded-full group-hover:scale-110 transition-transform">
-                            <svg 
-                              className="w-8 h-8 text-black ml-1" 
-                              fill="currentColor" 
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M8 5v14l11-7z"/>
-                            </svg>
-                          </div>
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Episode Details */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Episode {selectedEpisode.episode_number}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
-                      {selectedEpisode.overview || "No description available."}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-500">
-                      Air Date: <span className="font-medium">{selectedEpisode.air_date}</span>
-                    </p>
-                    {selectedEpisode.runtime && (
-                      <p className="text-sm text-gray-500">
-                        Runtime: <span className="font-medium">{selectedEpisode.runtime} minutes</span>
-                      </p>
-                    )}
-                    {selectedEpisode.vote_average && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-yellow-400 text-lg">★</span>
-                        <span className="font-medium text-sm">
-                          {selectedEpisode.vote_average.toFixed(1)}/10
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EpisodeDetailModal
+        isOpen={showEpisodeModal}
+        onClose={() => setShowEpisodeModal(false)}
+        episode={selectedEpisode}
+      />
     </main>
   );
 }
