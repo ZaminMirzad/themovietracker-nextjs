@@ -93,9 +93,9 @@ export default function BookmarksPage() {
           {/* Page Content - Above backdrop */}
           <div className="relative z-10 min-h-screen flex flex-col">
             {/* Header - Always visible above backdrop */}
-            <div className="pt-8 pb-6 px-6">
+            <div className="pt-4 sm:pt-8 pb-4 sm:pb-6 px-3 sm:px-6">
               <div className="max-w-7xl mx-auto">
-                <div className="mb-2 p-8 relative">
+                <div className="mb-2 p-4 sm:p-8 relative">
                   {/* Modern accent line with glow */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 shadow-lg shadow-red-500/25 "></div>
                   
@@ -116,10 +116,10 @@ export default function BookmarksPage() {
                   <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-blue-500/5 opacity-20 blur-sm"></div>
                   
                   <div className="relative z-10 ">
-                    <h1 className="text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-200 dark:to-white bg-clip-text text-transparent mb-3 tracking-tight drop-shadow-sm">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-200 dark:to-white bg-clip-text text-transparent mb-3 tracking-tight drop-shadow-sm">
                       My Bookmarks
                     </h1>
-                    <p className="text-xl text-gray-700 dark:text-gray-300 font-medium leading-relaxed backdrop-blur-sm">
+                    <p className="text-base sm:text-lg lg:text-xl text-gray-700 dark:text-gray-300 font-medium leading-relaxed backdrop-blur-sm">
                       Welcome back, <span className="font-semibold text-red-500 dark:text-red-400 drop-shadow-sm">{user?.fullName || user?.username}</span>! You have{" "}
                       <span className="font-bold text-blue-600 dark:text-blue-400 drop-shadow-sm">{bookmarks?.length}</span> bookmarked items.
                     </p>
@@ -129,45 +129,45 @@ export default function BookmarksPage() {
             </div>
 
             {bookmarks?.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-center justify-center px-3 sm:px-0">
                 <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-6 text-gray-500">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 text-gray-500">
                     <Heart className="w-full h-full" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-light-foreground dark:text-dark-foreground mb-2">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-light-foreground dark:text-dark-foreground mb-2">
                     No bookmarks yet
                   </h2>
-                  <p className="text-light-input-text dark:text-dark-input-text mb-6">
+                  <p className="text-sm sm:text-base text-light-input-text dark:text-dark-input-text mb-4 sm:mb-6 px-4 sm:px-0">
                     Start bookmarking your favorite movies and TV shows to see them
                     here.
                   </p>
                   <Link
                     href="/"
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-200"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors duration-200 text-sm sm:text-base"
                   >
                     Discover Movies & Shows
                   </Link>
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <div className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6">
                 {/* 3D Carousel Container */}
                 <div className="relative w-full max-w-7xl">
                   {/* Navigation Arrows */}
                   <button
                     onClick={prevSlide}
                     disabled={isTransitioning}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-sm border border-light-border dark:border-dark-border rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-sm border border-light-border dark:border-dark-border rounded-full p-2 sm:p-4 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ChevronLeft className="w-6 h-6 text-light-foreground dark:text-dark-foreground" />
+                    <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 text-light-foreground dark:text-dark-foreground" />
                   </button>
 
                   <button
                     onClick={nextSlide}
                     disabled={isTransitioning}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-sm border border-light-border dark:border-dark-border rounded-full p-4 hover:shadow-xl transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-sm border border-light-border dark:border-dark-border rounded-full p-2 sm:p-4 hover:shadow-xl transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ChevronRight className="w-6 h-6 text-light-foreground dark:text-dark-foreground" />
+                    <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 text-light-foreground dark:text-dark-foreground" />
                   </button>
 
                   {/* Center Featured Card */}
@@ -190,7 +190,7 @@ export default function BookmarksPage() {
                         }}
                       >
                         {/* Featured Card */}
-                        <div className="relative w-80 h-96 rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="relative w-64 h-80 sm:w-80 sm:h-96 rounded-2xl overflow-hidden shadow-2xl">
                           <Image
                             src={`https://image.tmdb.org/t/p/w500${currentBookmark?.poster_path || currentBookmark?.backdrop_path}`}
                             alt={currentBookmark?.title || "No title"}

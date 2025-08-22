@@ -76,8 +76,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
         )}
       </div>
 
-      <div className="p-2">
-        <h3 className="text-sm font-semibold line-clamp-2">{item.title}</h3>
+      <div className="p-2 sm:p-3">
+        <h3 className="text-sm sm:text-base font-semibold line-clamp-2 leading-tight mb-1">{item.title}</h3>
         <p className="text-xs text-gray-500">
           {item.release_date || item.first_air_date}
         </p>

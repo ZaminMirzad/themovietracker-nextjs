@@ -38,14 +38,14 @@ export default function Home() {
 
   // render sections
   const renderSection = (title: string, items: MediaItem[]) => (
-    <div className="mb-8">
-      <h2 className="text-lg mb-3">{title}</h2>
-      <div className="flex gap-4 overflow-hidden flex-wrap p-2">
+    <div className="mb-6 sm:mb-8">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 px-1">{title}</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4 px-1">
         {items.length < 1 ? (
           Array.from({ length: 8 }).map((_, idx) => (
             <div
               key={idx}
-              className="w-[130px] min-w-[130px] h-[100px] dark:bg-dark-foreground/50 bg-dark-input-border/50 rounded-xl animate-pulse"
+              className="w-full aspect-[13/8] dark:bg-dark-foreground/50 bg-dark-input-border/50 rounded-xl animate-pulse"
             ></div>
           ))
         ) : (
@@ -61,7 +61,7 @@ export default function Home() {
               return (
                 <motion.div
                   key={idx}
-                  className="relative w-[130px] min-w-[130px] overflow-hidden rounded-xl bg-white shadow-md hover:ring-2 cursor-pointer"
+                  className="relative w-full aspect-[13/8] overflow-hidden rounded-xl bg-white shadow-md hover:ring-2 cursor-pointer group"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -75,22 +75,28 @@ export default function Home() {
                     }
                     alt={title || "Image"}
                     loading={"lazy"}
-                    width={130}
-                    height={70}
-                    style={{ width: "auto", height: "auto" }}
-                    className="rounded-lg object-cover overflow-hidden w-auto h-auto"
+                    fill
+                    className="rounded-lg object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                   {rating && (
-                    <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      <span className="text-yellow-400">★</span>
-                      {rating}
+                    <div className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-black bg-opacity-70 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex items-center gap-1">
+                      <span className="text-yellow-400 text-xs">★</span>
+                      <span className="text-xs font-medium">{rating}</span>
                     </div>
                   )}
                   {isTV && (
-                    <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                    <div className="absolute top-1 sm:top-2 right-1 sm:right-2 bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
                       TV
                     </div>
                   )}
+                  {/* Mobile overlay with title */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 sm:hidden">
+                    <div className="absolute bottom-0 left-0 right-0 p-2">
+                      <p className="text-white text-xs font-medium line-clamp-2 leading-tight">
+                        {title}
+                      </p>
+                    </div>
+                  </div>
                 </motion.div>
               );
             })}
@@ -111,12 +117,12 @@ export default function Home() {
   // Show loading state
   if (isLoading && !weekTrending) {
     return (
-      <main>
+      <main className="px-1">
         <FilteringTabs setActiveTab={setActiveTab} activeTab={activeTab} />
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading movie data...</p>
+            <p className="text-gray-400 text-sm sm:text-base">Loading movie data...</p>
           </div>
         </div>
       </main>
@@ -124,7 +130,7 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main className="px-1">
       <FilteringTabs setActiveTab={setActiveTab} activeTab={activeTab} />
 
       {/* filtering  */}
