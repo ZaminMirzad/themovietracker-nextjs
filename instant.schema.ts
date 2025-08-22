@@ -12,12 +12,13 @@ const _schema = i.schema({
       email: i.string().unique().indexed().optional(),
     }),
     bookmarks: i.entity({
-      backdrop_path: i.string().optional(),
-      media_type: i.string().optional(),
-      movieId: i.any().optional(),
-      overview: i.string().optional(),
-      poster_path: i.string().optional(),
+      movieId: i.any().unique().indexed(), // Indexed for fast lookups
       title: i.string().optional(),
+      poster_path: i.string().optional(),
+      backdrop_path: i.string().optional(),
+      media_type: i.string().indexed(), // Indexed for fast lookups
+      added_at: i.string().optional(), // Added this missing field
+      overview: i.string().optional(),
     }),
   },
   links: {},

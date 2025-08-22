@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState } from "react";
+import Image from "next/image";
 
 export interface Trailer {
   key: string;
@@ -21,10 +21,10 @@ export const TrailerPlayer: React.FC<TrailerPlayerProps> = ({
   trailers,
   backdropPath,
   title,
-  className = '',
+  className = "",
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedTrailer, setSelectedTrailer] = useState<string>('');
+  const [selectedTrailer, setSelectedTrailer] = useState<string>("");
 
   const handlePlayTrailer = () => {
     if (trailers.length > 0) {
@@ -59,7 +59,7 @@ export const TrailerPlayer: React.FC<TrailerPlayerProps> = ({
         <div className="relative w-full h-[350px]">
           <Image
             src={`https://image.tmdb.org/t/p/w500${backdropPath}`}
-            alt={title || 'Backdrop'}
+            alt={title || "Backdrop"}
             width={600}
             height={250}
             className="rounded-xl object-cover w-full h-auto"
@@ -70,12 +70,12 @@ export const TrailerPlayer: React.FC<TrailerPlayerProps> = ({
               className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
             >
               <div className="bg-white bg-opacity-90 p-4 rounded-full group-hover:scale-110 transition-transform">
-                <svg 
-                  className="w-8 h-8 text-black ml-1" 
-                  fill="currentColor" 
+                <svg
+                  className="w-8 h-8 text-black ml-1"
+                  fill="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path d="M8 5v14l11-7z"/>
+                  <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
             </button>

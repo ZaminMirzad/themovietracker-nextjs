@@ -2,7 +2,9 @@ export default function FilteringTabs({
   setActiveTab,
   activeTab,
 }: {
-  setActiveTab: (tab: "all" | "currently" | "suggested" | "previously" | "tv") => void;
+  setActiveTab: (
+    tab: "all" | "currently" | "suggested" | "previously" | "tv",
+  ) => void;
   activeTab: string;
 }) {
   return (

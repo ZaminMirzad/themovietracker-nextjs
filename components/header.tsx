@@ -48,7 +48,7 @@ export default function Header() {
   const router = useRouter();
 
   const handleSearchItemClick = (id: string | number, mediaType?: string) => {
-    const path = mediaType === 'tv' ? `/tv/${id}` : `/movie/${id}`;
+    const path = mediaType === "tv" ? `/tv/${id}` : `/movie/${id}`;
     setShowModal(false);
     clearSearch();
     setTimeout(() => {
@@ -61,7 +61,9 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-2">
-            <h1 className="text-4xl font-bold text-light-foreground dark:text-dark-foreground">The <br /> Movie <br /> Tracker</h1>
+            <h1 className="text-4xl font-bold text-light-foreground dark:text-dark-foreground">
+              The <br /> Movie <br /> Tracker
+            </h1>
           </Link>
 
           <div className="flex-1 max-w-md mx-8">
@@ -107,23 +109,35 @@ export default function Header() {
                   Sign In
                 </button>
               </SignInButton>
-              <Link 
-                href="/signup" 
+              <Link
+                href="/signup"
                 className="text-light-input-background cursor-pointer hover:text-white dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
               >
                 Sign Up
               </Link>
             </SignedOut>
             <SignedIn>
-              <Link 
-                href="/bookmarks" 
+              <Link
+                href="/bookmarks"
                 className="text-light-input-background cursor-pointer hover:text-white dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                  />
                 </svg>
               </Link>
-              <UserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8" } }} />
+              <UserButton
+                appearance={{ elements: { userButtonAvatarBox: "w-8 h-8" } }}
+              />
             </SignedIn>
           </div>
         </div>

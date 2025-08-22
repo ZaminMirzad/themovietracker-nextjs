@@ -1,7 +1,7 @@
 // Centralized API service for fetching movie and TV show data
 
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
+const BASE_URL = "https://api.themoviedb.org/3";
 
 // Generic fetch function with error handling
 async function fetchData<T>(url: string): Promise<T> {
@@ -38,7 +38,7 @@ export const movieApi = {
   async getRelated(movieId: string) {
     const url = `${BASE_URL}/movie/${movieId}/similar?api_key=${API_KEY}`;
     return fetchData(url);
-  }
+  },
 };
 
 // TV Show data fetching
@@ -61,18 +61,21 @@ export const tvApi = {
   async getRelated(tvId: string) {
     const url = `${BASE_URL}/tv/${tvId}/similar?api_key=${API_KEY}`;
     return fetchData(url);
-  }
+  },
 };
 
 // Utility functions for data processing
 export const dataUtils = {
   processTrailers(trailers: any[]) {
-    return trailers?.filter(
-      (trailer: any) => trailer.type === "Trailer" && trailer.site === "YouTube"
-    ) || [];
+    return (
+      trailers?.filter(
+        (trailer: any) =>
+          trailer.type === "Trailer" && trailer.site === "YouTube",
+      ) || []
+    );
   },
 
   processRelatedMedia(results: any[]) {
     return results || [];
-  }
+  },
 };

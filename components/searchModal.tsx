@@ -71,13 +71,15 @@ export default function SearchModal({
                 >
                   <div className="relative overflow-hidden rounded-lg">
                     <Image
-                      src={imageBaseUrl + (item.poster_path || item.backdrop_path)}
+                      src={
+                        imageBaseUrl + (item.poster_path || item.backdrop_path)
+                      }
                       alt={item.title || item.name || "Movie"}
                       width={120}
                       height={180}
                       className="w-full h-auto object-cover transition-transform duration-200 group-hover:scale-105"
                     />
-                    {item.media_type === 'tv' && (
+                    {item.media_type === "tv" && (
                       <div className="absolute top-1 right-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">
                         TV
                       </div>

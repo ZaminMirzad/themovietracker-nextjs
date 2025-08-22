@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface RatingProps {
   rating: number;
@@ -6,9 +6,13 @@ interface RatingProps {
   className?: string;
 }
 
-export default function Rating({ rating, maxRating = 10, className = '' }: RatingProps) {
+export default function Rating({
+  rating,
+  maxRating = 10,
+  className = "",
+}: RatingProps) {
   const percentage = (rating / maxRating) * 100;
-  
+
   return (
     <div className={`flex items-center gap-1 ${className}`}>
       <div className="relative w-12 h-12">

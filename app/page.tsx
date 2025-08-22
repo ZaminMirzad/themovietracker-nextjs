@@ -1,14 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FilteringTabs from "@/components/filteringTabs";
 import { useRouter } from "next/navigation";
-import { db } from "@/lib/instantdb";
-import { useAppStore } from "@/store/useStore"
-
+import { useAppStore } from "@/store/useStore";
 
 interface MediaItem {
   id: string | number;
@@ -23,10 +20,11 @@ interface MediaItem {
 
 export default function Home() {
   const router = useRouter();
-  
+
   // Get data and functions from store
-  const { movieData, fetchMovieData, setBookmarks } = useAppStore();
-  const { weekTrending, popular, upcoming, popularTV, topRatedTV, isLoading } = movieData;
+  const { movieData, fetchMovieData, fetchBookmarks } = useAppStore();
+  const { weekTrending, popular, upcoming, popularTV, topRatedTV, isLoading } =
+    movieData;
 
   const [activeTab, setActiveTab] = useState<
     "all" | "currently" | "suggested" | "previously" | "tv"
@@ -35,23 +33,8 @@ export default function Home() {
   // Fetch movie data on component mount
   useEffect(() => {
     fetchMovieData();
-  }, [fetchMovieData]);
-
-
-  // Handle bookmarks from database
-  const { data } = db.useQuery({ bookmarks: {} });
-  useEffect(() => {
-    if (data?.bookmarks) {
-      // Ensure each bookmark has a movieId property as required by IBookmark
-      const bookmarksWithMovieId = data.bookmarks.map((bookmark: MediaItem) => ({
-        ...bookmark,
-        movieId: bookmark.movieId ?? bookmark.id,
-        title: bookmark.title || bookmark.name || 'Untitled',
-        media_type: (bookmark.media_type as 'movie' | 'tv') || 'movie',
-      }));
-      setBookmarks(bookmarksWithMovieId);
-    }
-  }, [data?.bookmarks, setBookmarks]);
+    fetchBookmarks();
+  }, []);
 
   // render sections
   const renderSection = (title: string, items: MediaItem[]) => (
@@ -71,8 +54,10 @@ export default function Home() {
               const src = typeof item === "string" ? item : item.backdrop_path;
               const rating = typeof item === "object" && item.rating;
               const title = item.title || item.name;
-                             const isTV = Boolean(item.media_type === 'tv' || item.first_air_date);
-              
+              const isTV = Boolean(
+                item.media_type === "tv" || item.first_air_date,
+              );
+
               return (
                 <motion.div
                   key={idx}
@@ -83,13 +68,17 @@ export default function Home() {
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => handleClick(item.id, isTV)}
                 >
-                                     <Image
-                     src={(process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '') + (src || '')}
-                     alt={title || 'Image'}
-                     width={130}
-                     height={70}
-                    
-                    className="rounded-lg object-cover overflow-hidden w-auto"
+                  <Image
+                    src={
+                      (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || "") +
+                      (src || "")
+                    }
+                    alt={title || "Image"}
+                    loading={"lazy"}
+                    width={130}
+                    height={70}
+                    style={{ width: "auto", height: "auto" }}
+                    className="rounded-lg object-cover overflow-hidden w-auto h-auto"
                   />
                   {rating && (
                     <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
@@ -118,7 +107,7 @@ export default function Home() {
       router.push(`/movie/${id}`);
     }
   }
-  
+
   // Show loading state
   if (isLoading && !weekTrending) {
     return (

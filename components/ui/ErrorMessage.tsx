@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 interface ErrorMessageProps {
   message: string;
@@ -11,7 +11,7 @@ interface ErrorMessageProps {
 export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   message,
   onRetry,
-  className = '',
+  className = "",
 }) => {
   return (
     <div className={`text-center py-8 ${className}`}>

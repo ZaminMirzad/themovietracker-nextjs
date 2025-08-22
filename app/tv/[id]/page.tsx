@@ -13,9 +13,9 @@ export default function TVShowPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  
+
   type TVShow = {
-    id?: number;
+    id?: string | number;
     poster_path?: string;
     backdrop_path?: string;
     name?: string;
@@ -63,7 +63,7 @@ export default function TVShowPage() {
     season_number: number;
     episodes: Episode[];
   };
-  
+
   const [tvShow, setTvShow] = useState<TVShow | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [relatedShows, setRelatedShows] = useState<RelatedShow[]>([]);
@@ -79,20 +79,26 @@ export default function TVShowPage() {
   useEffect(() => {
     async function fetchTVShow() {
       if (!id) return;
-      
+
       try {
-        const [tvData, trailersData, relatedData] = await Promise.all([
+        const [tvData, trailersData, relatedData] = (await Promise.all([
           tvApi.getDetails(id),
           tvApi.getTrailers(id),
-          tvApi.getRelated(id)
-        ]) as [TVShow, any, any];
+          tvApi.getRelated(id),
+        ])) as [TVShow, any, any];
 
         setTvShow(tvData);
         setTrailers(dataUtils.processTrailers((trailersData as any).results));
-        setRelatedShows(dataUtils.processRelatedMedia((relatedData as any).results));
+        setRelatedShows(
+          dataUtils.processRelatedMedia((relatedData as any).results),
+        );
 
-        if (dataUtils.processTrailers((trailersData as any).results).length > 0) {
-          setSelectedTrailer(dataUtils.processTrailers((trailersData as any).results)[0].key);
+        if (
+          dataUtils.processTrailers((trailersData as any).results).length > 0
+        ) {
+          setSelectedTrailer(
+            dataUtils.processTrailers((trailersData as any).results)[0].key,
+          );
         }
 
         // Fetch seasons data
@@ -108,7 +114,7 @@ export default function TVShowPage() {
         console.error("Error fetching TV show:", error);
       }
     }
-    
+
     if (id) {
       fetchTVShow();
     }
@@ -133,7 +139,9 @@ export default function TVShowPage() {
     setShowEpisodeModal(true);
   };
 
-  const currentSeason = seasons.find(season => season.season_number === selectedSeason);
+  const currentSeason = seasons.find(
+    (season) => season.season_number === selectedSeason,
+  );
 
   return (
     <main>
@@ -144,15 +152,15 @@ export default function TVShowPage() {
             {tvShow?.name || "Loading..."}
           </h1>
           <BookmarkButton
-            movieId={tvShow?.id}
-            title={tvShow?.name || ''}
+            movieId={tvShow?.id as string | number}
+            title={tvShow?.name || ""}
             poster_path={tvShow?.poster_path}
             backdrop_path={tvShow?.backdrop_path}
             media_type="tv"
-            
+            overview={tvShow?.overview}
           />
         </div>
-        
+
         <div className="flex flex-col lg:flex-row gap-8 mb-8">
           <div className="w-full lg:w-1/3 flex-1/5 h-[350px]">
             <Image
@@ -163,33 +171,50 @@ export default function TVShowPage() {
               className="rounded-xl w-full object-cover h-auto"
             />
           </div>
-          
+
           <div className="flex flex-1/5 flex-col">
             <div className="flex gap-2 mb-3 flex-wrap">
               {tvShow?.genres?.map((genre) => (
-                <span key={genre.id} className="border rounded-full px-3 py-1 text-sm">
+                <span
+                  key={genre.id}
+                  className="border rounded-full px-3 py-1 text-sm"
+                >
                   {genre.name}
                 </span>
               ))}
             </div>
-            
+
             <p className="text-gray-600 mb-4">
-              {tvShow?.overview?.slice(0, 250) || "Loading TV show description..."}
+              {tvShow?.overview?.slice(0, 250) ||
+                "Loading TV show description..."}
             </p>
-            
+
             <div className="space-y-2 mb-4">
-              <p className="text-sm text-gray-500">Status: <span className="font-medium">{tvShow?.status}</span></p>
-              <p className="text-sm text-gray-500">First Air Date: <span className="font-medium">{tvShow?.first_air_date}</span></p>
-              <p className="text-sm text-gray-500">Seasons: <span className="font-medium">{tvShow?.number_of_seasons}</span></p>
-              <p className="text-sm text-gray-500">Episodes: <span className="font-medium">{tvShow?.number_of_episodes}</span></p>
+              <p className="text-sm text-gray-500">
+                Status: <span className="font-medium">{tvShow?.status}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                First Air Date:{" "}
+                <span className="font-medium">{tvShow?.first_air_date}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Seasons:{" "}
+                <span className="font-medium">{tvShow?.number_of_seasons}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Episodes:{" "}
+                <span className="font-medium">
+                  {tvShow?.number_of_episodes}
+                </span>
+              </p>
             </div>
-            
+
             <p className="text-sm text-gray-500 mb-2">IMDB Rating</p>
             <div className="flex items-center gap-2 mb-4">
               <Rating rating={tvShow?.vote_average || 0} />
             </div>
           </div>
-          
+
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
               {isPlayingTrailer && selectedTrailer ? (
@@ -223,12 +248,12 @@ export default function TVShowPage() {
                       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
                     >
                       <div className="bg-white bg-opacity-90 p-4 rounded-full group-hover:scale-110 transition-transform">
-                        <svg 
-                          className="w-8 h-8 text-black ml-1" 
-                          fill="currentColor" 
+                        <svg
+                          className="w-8 h-8 text-black ml-1"
+                          fill="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path d="M8 5v14l11-7z"/>
+                          <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
                     </button>
@@ -245,11 +270,11 @@ export default function TVShowPage() {
             <h2 className="text-2xl font-bold mb-4">Seasons</h2>
             <div className="flex gap-2 mb-6 flex-wrap">
               {seasons.map((season, index) => (
-                <button 
-                  key={season.season_number} 
+                <button
+                  key={season.season_number}
                   className={`px-3 py-1 border rounded-md transition-colors ${
-                    selectedSeason === season.season_number 
-                      ? "bg-blue-500 text-white border-blue-500" 
+                    selectedSeason === season.season_number
+                      ? "bg-blue-500 text-white border-blue-500"
                       : "hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                   onClick={() => setSelectedSeason(season.season_number)}
@@ -266,7 +291,7 @@ export default function TVShowPage() {
                   Season {currentSeason.season_number} - {currentSeason.name}
                 </h3>
                 <p className="text-gray-600 mb-4">{currentSeason.overview}</p>
-                
+
                 {/* Episodes Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {currentSeason.episodes?.map((episode: any, idx: number) => (
@@ -283,9 +308,15 @@ export default function TVShowPage() {
                         className="object-cover w-full h-[120px]"
                       />
                       <div className="p-3">
-                        <h3 className="text-sm font-semibold mb-2 line-clamp-2">{episode.name}</h3>
-                        <p className="text-xs text-gray-500 mb-2">Episode {episode.episode_number}</p>
-                        <p className="text-xs text-gray-500">{episode.air_date}</p>
+                        <h3 className="text-sm font-semibold mb-2 line-clamp-2">
+                          {episode.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Episode {episode.episode_number}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {episode.air_date}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -318,7 +349,9 @@ export default function TVShowPage() {
                     {show.vote_average && (
                       <div className="absolute top-2 left-2 bg-black/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md flex items-center gap-1 shadow-lg">
                         <span className="text-yellow-400">★</span>
-                        <span className="font-semibold">{show.vote_average.toFixed(1)}</span>
+                        <span className="font-semibold">
+                          {show.vote_average.toFixed(1)}
+                        </span>
                       </div>
                     )}
                   </div>

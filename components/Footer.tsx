@@ -21,7 +21,7 @@ const Footer = () => {
               </span>
             </div>
             <p className=" mb-4 max-w-md">
-              Discover, track, and share your favorite movies and TV shows. 
+              Discover, track, and share your favorite movies and TV shows.
               Built with modern technology and passion for cinema.
             </p>
             <div className="flex items-center space-x-1 text-sm text-gray-400">
@@ -35,22 +35,34 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 ">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/movie/popular" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/movie/popular"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Popular Movies
                 </Link>
               </li>
               <li>
-                <Link href="/tv/popular" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/tv/popular"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Popular TV Shows
                 </Link>
               </li>
               <li>
-                <Link href="/search" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/search"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Search
                 </Link>
               </li>
@@ -62,9 +74,9 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-white">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <a 
-                  href="https://www.themoviedb.org/" 
-                  target="_blank" 
+                <a
+                  href="https://www.themoviedb.org/"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
@@ -72,17 +84,26 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/about"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/privacy"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/terms"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Terms of Service
                 </Link>
               </li>
@@ -94,32 +115,32 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex space-x-6 mb-4 md:mb-0">
-              <a 
-                href="https://github.com/ZaminMirzad" 
-                target="_blank" 
+              <a
+                href="https://github.com/ZaminMirzad"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <Github className="h-6 w-6" />
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              <a
+                href="https://twitter.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <X className="h-6 w-6" />
               </a>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
+              <a
+                href="https://instagram.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <Instagram className="h-6 w-6" />
               </a>
             </div>
-            
+
             <p className="text-gray-400 text-sm">
               © {currentYear} MovieTracker. All rights reserved.
             </p>

@@ -80,23 +80,30 @@ export default function EpisodeDetailModal({
                 <div className="space-y-2 text-sm">
                   {episode.air_date && (
                     <p className="text-gray-500 dark:text-gray-400">
-                      Air Date: <span className="font-medium">{episode.air_date}</span>
+                      Air Date:{" "}
+                      <span className="font-medium">{episode.air_date}</span>
                     </p>
                   )}
                   {episode.runtime && (
                     <p className="text-gray-500 dark:text-gray-400">
-                      Runtime: <span className="font-medium">{episode.runtime} minutes</span>
+                      Runtime:{" "}
+                      <span className="font-medium">
+                        {episode.runtime} minutes
+                      </span>
                     </p>
                   )}
                   {episode.vote_average && (
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 dark:text-gray-400">Rating:</span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Rating:
+                      </span>
                       <div className="flex items-center">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <span
                             key={star}
                             className={`text-sm ${
-                              star <= Math.round((episode.vote_average || 0) / 2)
+                              star <=
+                              Math.round((episode.vote_average || 0) / 2)
                                 ? "text-yellow-400"
                                 : "text-gray-300"
                             }`}

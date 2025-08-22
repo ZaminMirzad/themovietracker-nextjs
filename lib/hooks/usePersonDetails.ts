@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { fetchPersonDetails } from '@/lib/apiService';
+import { useState, useCallback } from "react";
+import { fetchPersonDetails } from "@/lib/apiService";
 
 interface PersonDetails {
   id: number;
@@ -20,17 +20,21 @@ interface UsePersonDetailsReturn {
 }
 
 export function usePersonDetails(): UsePersonDetailsReturn {
-  const [selectedPerson, setSelectedPerson] = useState<PersonDetails | null>(null);
+  const [selectedPerson, setSelectedPerson] = useState<PersonDetails | null>(
+    null,
+  );
   const [showModal, setShowModal] = useState(false);
 
   const handlePersonClick = useCallback(async (personData: any) => {
     try {
       const details = await fetchPersonDetails(personData.id);
-      
+
       // Ensure both personData and details are objects before spreading
-      const personObject = personData && typeof personData === 'object' ? personData : {};
-      const detailsObject = details && typeof details === 'object' ? details : {};
-      
+      const personObject =
+        personData && typeof personData === "object" ? personData : {};
+      const detailsObject =
+        details && typeof details === "object" ? details : {};
+
       setSelectedPerson({ ...personObject, ...detailsObject });
       setShowModal(true);
     } catch (error) {
@@ -47,6 +51,6 @@ export function usePersonDetails(): UsePersonDetailsReturn {
     selectedPerson,
     showModal,
     handlePersonClick,
-    closeModal
+    closeModal,
   };
 }

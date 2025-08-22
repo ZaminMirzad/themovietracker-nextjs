@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import React from 'react';
+import Image from "next/image";
+import React from "react";
 
 export interface Episode {
   id: number;
@@ -22,7 +22,7 @@ interface EpisodeCardProps {
 export const EpisodeCard: React.FC<EpisodeCardProps> = ({
   episode,
   onClick,
-  className = '',
+  className = "",
 }) => {
   return (
     <div
