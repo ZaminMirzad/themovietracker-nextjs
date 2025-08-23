@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { useState } from "react";
 import { id as uuid } from "@instantdb/react";
-import { Heart, Bookmark, Sparkles } from "lucide-react";
+import { Heart, Sparkles, Plus } from "lucide-react";
 
 interface BookmarkButtonProps {
   movieId: string | number;
@@ -101,10 +101,23 @@ export default function BookmarkButton({
                   animate={{ rotate: isHovered ? 360 : 0 }}
                   transition={{ duration: 0.6, ease: "easeInOut" }}
                 >
-                  <Bookmark className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <Plus className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </motion.div>
                 <span className="font-medium text-gray-700 dark:text-gray-300">Sign in</span>
               </div>
+              
+              {/* Hover tooltip */}
+              {isHovered && (
+                <motion.div
+                  className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                >
+                  Sign in to bookmark
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
+                </motion.div>
+              )}
               
               {/* Animated background */}
               <motion.div
@@ -151,7 +164,7 @@ export default function BookmarkButton({
                   {isBookmarked ? (
                     <Heart className="w-5 h-5 text-white fill-current" />
                   ) : (
-                    <Bookmark className="w-5 h-5 text-white" />
+                    <Plus className="w-5 h-5 text-white" />
                   )}
                 </motion.div>
               )}
@@ -159,6 +172,19 @@ export default function BookmarkButton({
                 {isBookmarked ? "Bookmarked" : "Bookmark"}
               </span>
             </div>
+
+            {/* Hover tooltip */}
+            {isHovered && (
+              <motion.div
+                className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+              >
+                {isBookmarked ? "Remove from your bookmarks" : "Add to your bookmarks"}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
+              </motion.div>
+            )}
 
             {/* Sparkle effect for bookmarked state */}
             {isBookmarked && isHovered && (
@@ -195,9 +221,24 @@ export default function BookmarkButton({
               className={`group relative p-3 rounded-xl transition-all duration-300 bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-600 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 ${className}`}
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.9 }}
+              onHoverStart={() => setIsHovered(true)}
+              onHoverEnd={() => setIsHovered(false)}
               aria-label="Sign in to bookmark"
             >
-              <Bookmark className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200" />
+              <Plus className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200" />
+              
+              {/* Hover tooltip */}
+              {isHovered && (
+                <motion.div
+                  className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                >
+                  Sign in to bookmark
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
+                </motion.div>
+              )}
             </motion.button>
           </SignInButton>
         </SignedOut>
@@ -214,6 +255,8 @@ export default function BookmarkButton({
             } ${className}`}
             whileHover={{ scale: 1.1, rotate: isBookmarked ? -5 : 5 }}
             whileTap={{ scale: 0.9 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
             aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
             {isLoading ? (
@@ -230,8 +273,21 @@ export default function BookmarkButton({
                 {isBookmarked ? (
                   <Heart className="w-5 h-5 text-white fill-current" />
                 ) : (
-                  <Bookmark className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200" />
+                  <Plus className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200" />
                 )}
+              </motion.div>
+            )}
+            
+            {/* Hover tooltip */}
+            {isHovered && (
+              <motion.div
+                className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+              >
+                {isBookmarked ? "Remove from your bookmarks" : "Add to your bookmarks"}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
               </motion.div>
             )}
           </motion.button>
@@ -250,14 +306,29 @@ export default function BookmarkButton({
             whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
           >
             <motion.div
               animate={{ rotate: isHovered ? 360 : 0 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
             >
-              <Bookmark className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Plus className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </motion.div>
             <span className="text-gray-700 dark:text-gray-300">Sign in to bookmark</span>
+            
+            {/* Hover tooltip */}
+            {isHovered && (
+              <motion.div
+                className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+              >
+                Sign in to bookmark
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
+              </motion.div>
+            )}
             
             {/* Hover effect */}
             <motion.div
@@ -302,7 +373,7 @@ export default function BookmarkButton({
               {isBookmarked ? (
                 <Heart className="w-5 h-5 text-white fill-current" />
               ) : (
-                <Bookmark className="w-5 h-5 text-white" />
+                <Plus className="w-5 h-5 text-white" />
               )}
             </motion.div>
           )}
@@ -310,6 +381,19 @@ export default function BookmarkButton({
           <span className="text-white font-medium">
             {isBookmarked ? "Bookmarked" : "Bookmark"}
           </span>
+
+          {/* Hover tooltip */}
+          {isHovered && (
+            <motion.div
+              className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+            >
+              {isBookmarked ? "Remove from your bookmarks" : "Add to your bookmarks"}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-100"></div>
+            </motion.div>
+          )}
 
           {/* Sparkle effect for bookmarked state */}
           {isBookmarked && isHovered && (

@@ -60,7 +60,7 @@ export default function EpisodeDetailModal({
                 </button>
               </div>
 
-              {episode.still_path && (
+              {episode.still_path ? (
                 <div className="mb-4">
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${episode.still_path}`}
@@ -69,6 +69,20 @@ export default function EpisodeDetailModal({
                     height={338}
                     className="w-full h-auto rounded-lg"
                   />
+                </div>
+              ) : (
+                <div className="mb-4">
+                  <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-lg flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <div className="text-4xl mb-3">🎬</div>
+                      <div className="text-lg font-medium text-blue-700 dark:text-blue-300">
+                        Episode {episode.episode_number}
+                      </div>
+                      <div className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                        {episode.name || 'No title available'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
