@@ -81,7 +81,7 @@ export default function Header() {
                   onChange={(e) => setSearch(e.target.value)}
                   onFocus={onFocus}
                   onBlur={onBlur}
-                  className="w-full px-4 py-2 bg-light-background dark:bg-dark-background border border-gray-600 rounded-full text-light-foreground dark:text-dark-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-input-border dark:focus:ring-dark-accent"
+                  className="w-full px-4 py-2 bg-light-background/20 dark:bg-dark-background/20 backdrop-blur-sm border border-gray-600 rounded-full text-light-foreground dark:text-dark-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-input-border dark:focus:ring-dark-accent"
                 />
                 {search && (
                   <button

@@ -144,7 +144,7 @@ export default function TVShowPage() {
   );
 
   return (
-    <main className="min-h-screen bg-transparent dark:bg-dark-background/10 relative">
+    <main className="min-h-screen bg-transparent dark:bg-dark-background/10 relative rounded-2xl">
       {/* Full Page Backdrop Background - Behind everything */}
       {tvShow?.backdrop_path && (
         <div className="fixed inset-0 z-[-1]">
@@ -155,12 +155,12 @@ export default function TVShowPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-dark-background via-background/80 dark:via-dark-background/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-dark-background via-background/80 dark:via-dark-background/80 to-transparent dark:text-dark-foreground" />
         </div>
       )}
 
       {/* TV Show Details */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 relative z-10 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 relative z-10 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-red-700/40 shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(239,68,68,0.4)]">
         {/* Title and Bookmark Button - Now inline */}
         <div className="flex sm:flex-row justify-between items-center gap-4 mb-4 bg-transparent">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4 flex-1 text-white dark:text-dark-foreground">
@@ -189,7 +189,7 @@ export default function TVShowPage() {
             />
           </div>
 
-          <div className="flex flex-1/5 flex-col text-black">
+          <div className="flex flex-1/5 flex-col text-black dark:text-dark-foreground">
             <div className="flex gap-2 mb-3 flex-wrap">
               {tvShow?.genres?.map((genre) => (
                 <span
@@ -207,18 +207,18 @@ export default function TVShowPage() {
             </p>
 
             <div className="space-y-2 mb-4">
-              <p className="text-sm ">
+              <p className="text-sm dark:text-dark-foreground">
                 Status: <span className="font-medium">{tvShow?.status}</span>
               </p>
-              <p className="text-sm ">
+              <p className="text-sm dark:text-dark-foreground">
                 First Air Date:{" "}
                 <span className="font-medium">{tvShow?.first_air_date}</span>
               </p>
-              <p className="text-sm ">
+              <p className="text-sm dark:text-dark-foreground">
                 Seasons:{" "}
                 <span className="font-medium">{tvShow?.number_of_seasons}</span>
               </p>
-              <p className="text-sm ">
+              <p className="text-sm dark:text-dark-foreground">
                 Episodes:{" "}
                 <span className="font-medium">
                   {tvShow?.number_of_episodes}
@@ -226,7 +226,9 @@ export default function TVShowPage() {
               </p>
             </div>
 
-            <p className="text-sm text-gray-500 mb-2">IMDB Rating</p>
+            <p className="text-sm text-gray-500 dark:text-dark-foreground mb-2">
+              IMDB Rating
+            </p>
             <div className="flex items-center gap-2 mb-4">
               <Rating rating={tvShow?.vote_average || 0} />
             </div>
@@ -235,7 +237,7 @@ export default function TVShowPage() {
           <div className="w-full lg:w-1/3 flex-3/5">
             <div className="relative rounded-xl overflow-hidden">
               {isPlayingTrailer && selectedTrailer ? (
-                <div className="relative w-full h-[250px] sm:h-[380px] rounded-xl overflow-hidden">
+                <div className="relative w-full h-[250px] sm:h-[380px] rounded-xl overflow-hidden dark:text-dark-foreground">
                   <iframe
                     src={`https://www.youtube.com/embed/${selectedTrailer}?autoplay=1&rel=0`}
                     title="Trailer"
@@ -251,7 +253,7 @@ export default function TVShowPage() {
                   </button>
                 </div>
               ) : (
-                <div className="relative w-full h-[200px] sm:h-[250px] lg:h-[300px] rounded-xl overflow-hidden">
+                <div className="relative w-full h-[200px] sm:h-[250px] lg:h-[300px] rounded-xl overflow-hidden dark:text-dark-foreground">
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${tvShow?.backdrop_path}`}
                     alt="TV Show Backdrop"
@@ -262,11 +264,11 @@ export default function TVShowPage() {
                   {trailers.length > 0 && (
                     <button
                       onClick={handlePlayTrailer}
-                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
+                      className="absolute inset-0 flex items-center justify-center bg-black dark:bg-dark-background bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
                     >
-                      <div className="bg-white bg-opacity-90 p-3 sm:p-4 rounded-full group-hover:scale-110 transition-transform">
+                      <div className="bg-white dark:bg-dark-background bg-opacity-90 p-3 sm:p-4 rounded-full group-hover:scale-110 transition-transform">
                         <svg
-                          className="w-6 h-6 sm:w-8 sm:h-8 text-black ml-1"
+                          className="w-6 h-6 sm:w-8 sm:h-8 text-black dark:text-dark-foreground ml-1"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -289,12 +291,12 @@ export default function TVShowPage() {
               {seasons.map((season, index) => (
                 <button
                   key={season.season_number}
-                  className={`px-3 py-1 border rounded-md transition-colors ${
+                  className={`px-3 py-1 border rounded-md transition-colors dark:text-dark-foreground ${
                     selectedSeason === season.season_number
                       ? "bg-blue-500 text-white border-blue-500"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-dark-foreground"
                   }`}
-                  onClick={() => setSelectedSeason(season.season_number)}
+                  onClick={() => setSelectedSeason(season.season_number)} 
                 >
                   Season {season.season_number}
                 </button>
@@ -307,7 +309,7 @@ export default function TVShowPage() {
                 <h3 className="text-xl font-semibold mb-4">
                   Season {currentSeason.season_number} - {currentSeason.name}
                 </h3>
-                <p className="text-gray-600 mb-4">{currentSeason.overview}</p>
+                <p className="text-gray-600 dark:text-dark-foreground mb-4">{currentSeason.overview}</p>
 
                 {/* Episodes Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -110,7 +110,7 @@ export default function MoviePage() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent dark:bg-dark-background/10 relative">
+    <main className="min-h-screen bg-transparent dark:bg-dark-background/10 relative rounded-2xl">
       {/* Full Page Backdrop Background - Behind everything */}
       {movie.backdrop_path && (
         <div className="fixed inset-0 z-[-1]">
@@ -121,11 +121,11 @@ export default function MoviePage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-dark-background via-background/80 dark:via-dark-background/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-dark-background via-background/80 dark:via-dark-background/80 to-transparent dark:text-dark-foreground" />
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 relative z-10 backdrop-blur-sm rounded-lg">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 relative z-10 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-red-400/40 shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(239,68,68,0.4)]">
         {/* Title and Bookmark Button - Now inline */}
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
           <div className="flex-1 flex  justify-between items-start w-full">
@@ -134,7 +134,7 @@ export default function MoviePage() {
               {movie.title}
             </h1>
             {movie.tagline && (
-              <p className="text-base sm:text-lg text-muted-foreground dark:text-dark-muted-foreground italic">
+              <p className="text-base sm:text-lg text-muted-foreground dark:text-dark-muted-foreground italic dark:text-dark-foreground">
                 {movie.tagline}
               </p>
             )}
@@ -151,7 +151,7 @@ export default function MoviePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12 backdrop-blur-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12 backdrop-blur-sm dark:text-dark-foreground">
           {/* Left Column - Poster */}
           <div className="lg:col-span-1 ">
             <div className="sticky top-8 ">
@@ -166,7 +166,7 @@ export default function MoviePage() {
                     priority
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground dark:text-dark-muted-foreground">
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground dark:text-dark-muted-foreground dark:text-dark-foreground">
                     <svg
                       className="w-16 h-16"
                       fill="currentColor"
@@ -192,7 +192,7 @@ export default function MoviePage() {
                 {movie.genres.map((genre) => (
                   <span
                     key={genre.id}
-                    className="inline-block bg-accent/20 dark:bg-accent/30 text-accent dark:text-accent-foreground text-sm px-3 py-1 rounded-full"
+                    className="inline-block bg-accent/20 dark:bg-accent/30 text-accent dark:text-accent-foreground text-sm px-3 py-1 rounded-full dark:text-dark-foreground"
                   >
                     {genre.name}
                   </span>
@@ -205,14 +205,14 @@ export default function MoviePage() {
               <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-foreground dark:text-dark-foreground">
                 Overview
               </h2>
-              <p className="text-sm sm:text-base text-muted-foreground dark:text-dark-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground dark:text-dark-muted-foreground leading-relaxed dark:text-dark-foreground">
                 {movie.overview || "No overview available."}
               </p>
             </div>
 
             {/* Movie Info */}
             <div className="space-y-4 sm:space-y-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-light-foreground dark:text-dark-foreground">
+              <h2 className="text-xl sm:text-2xl font-bold text-light-foreground dark:text-dark-foreground dark:text-dark-foreground">
                 Movie Details
               </h2>
 
@@ -220,7 +220,7 @@ export default function MoviePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-dark-foreground">
                       Release Date
                     </span>
                     <span className="font-semibold text-gray-900 dark:text-white">
@@ -232,7 +232,7 @@ export default function MoviePage() {
 
                   {movie.runtime && (
                     <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-dark-foreground">
                         Runtime
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
@@ -242,7 +242,7 @@ export default function MoviePage() {
                   )}
 
                   <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-sm font-medium text-gray-500  dark:text-dark-foreground">
                       Status
                     </span>
                     <span className="font-semibold text-gray-900 dark:text-white">
@@ -255,7 +255,7 @@ export default function MoviePage() {
                 <div className="space-y-4">
                   {movie.budget && movie.budget > 0 && (
                     <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <span className="text-sm font-medium text-gray-500 dark:text-dark-foreground">
                         Budget
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
@@ -266,7 +266,7 @@ export default function MoviePage() {
 
                   {movie.revenue && movie.revenue > 0 && (
                     <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <span className="text-sm font-medium text-gray-500 dark:text-dark-foreground">
                         Revenue
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
@@ -280,7 +280,7 @@ export default function MoviePage() {
               {/* Rating Section */}
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <span className="text-sm font-medium text-gray-500  dark:text-dark-foreground">
                     Rating
                   </span>
                   <div className="flex items-center gap-3">
