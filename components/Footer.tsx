@@ -9,7 +9,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-light-background dark:bg-dark-background text-light-foreground dark:text-dark-foreground mt-16 border-t border-light-border dark:border-dark-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-20">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Brand Section */}
@@ -17,7 +17,7 @@ const Footer = () => {
             <div className="flex items-center space-x-2 mb-4">
               <Film className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
-                MovieTracker
+                TheMovieTracker
               </span>
             </div>
             <p className="text-sm sm:text-base text-light-input-text dark:text-dark-input-text mb-4 max-w-md">

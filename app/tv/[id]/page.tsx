@@ -144,11 +144,26 @@ export default function TVShowPage() {
   );
 
   return (
-    <main>
-              {/* TV Show Details */}
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4 flex-1">
+    <main className="min-h-screen bg-transparent dark:bg-dark-background/10 relative">
+      {/* Full Page Backdrop Background - Behind everything */}
+      {tvShow?.backdrop_path && (
+        <div className="fixed inset-0 z-[-1]">
+          <Image
+            src={`https://image.tmdb.org/t/p/original${tvShow.backdrop_path}`}
+            alt="TV Show backdrop"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-dark-background via-background/80 dark:via-dark-background/80 to-transparent" />
+        </div>
+      )}
+
+      {/* TV Show Details */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 relative z-10 backdrop-blur-sm">
+        {/* Title and Bookmark Button - Now inline */}
+        <div className="flex sm:flex-row justify-between items-center gap-4 mb-4 bg-transparent">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4 flex-1 text-white dark:text-dark-foreground">
             {tvShow?.name || "Loading..."}
           </h1>
           <BookmarkButton
@@ -158,21 +173,23 @@ export default function TVShowPage() {
             backdrop_path={tvShow?.backdrop_path}
             media_type="tv"
             overview={tvShow?.overview}
+            variant="minimal"
           />
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 mb-6 sm:mb-8">
-          <div className="w-full lg:w-1/3 flex-1/5 h-[250px] sm:h-[350px] max-w-sm mx-auto lg:mx-0">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 mb-6 sm:mb-8 backdrop-blur-sm">
+          <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted dark:bg-dark-muted max-w-sm mx-auto lg:mx-0 h-[300px] sm:h-[400px] lg:h-[450px]">
             <Image
               src={`https://image.tmdb.org/t/p/w500${tvShow?.poster_path}`}
               alt={tvShow?.name || "TV Show poster"}
               width={110}
               height={350}
-              className="rounded-xl w-full object-cover h-auto"
+              sizes="(max-width: 1024px) 100vw, 33vw"
+              className="rounded-xl w-full object-cover h-full"
             />
           </div>
 
-          <div className="flex flex-1/5 flex-col">
+          <div className="flex flex-1/5 flex-col text-black">
             <div className="flex gap-2 mb-3 flex-wrap">
               {tvShow?.genres?.map((genre) => (
                 <span
@@ -184,24 +201,24 @@ export default function TVShowPage() {
               ))}
             </div>
 
-            <p className="text-gray-600 mb-4 text-sm sm:text-base">
+            <p className=" mb-4 text-sm sm:text-base">
               {tvShow?.overview?.slice(0, 250) ||
                 "Loading TV show description..."}
             </p>
 
             <div className="space-y-2 mb-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm ">
                 Status: <span className="font-medium">{tvShow?.status}</span>
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm ">
                 First Air Date:{" "}
                 <span className="font-medium">{tvShow?.first_air_date}</span>
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm ">
                 Seasons:{" "}
                 <span className="font-medium">{tvShow?.number_of_seasons}</span>
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm ">
                 Episodes:{" "}
                 <span className="font-medium">
                   {tvShow?.number_of_episodes}
@@ -234,22 +251,22 @@ export default function TVShowPage() {
                   </button>
                 </div>
               ) : (
-                <div className="relative w-full h-[250px] sm:h-[350px]">
+                <div className="relative w-full h-[200px] sm:h-[250px] lg:h-[300px] rounded-xl overflow-hidden">
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${tvShow?.backdrop_path}`}
                     alt="TV Show Backdrop"
-                    width={600}
-                    height={250}
-                    className="rounded-xl object-cover w-full h-auto"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   {trailers.length > 0 && (
                     <button
                       onClick={handlePlayTrailer}
                       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-colors rounded-xl group"
                     >
-                      <div className="bg-white bg-opacity-90 p-4 rounded-full group-hover:scale-110 transition-transform">
+                      <div className="bg-white bg-opacity-90 p-3 sm:p-4 rounded-full group-hover:scale-110 transition-transform">
                         <svg
-                          className="w-8 h-8 text-black ml-1"
+                          className="w-6 h-6 sm:w-8 sm:h-8 text-black ml-1"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -266,7 +283,7 @@ export default function TVShowPage() {
 
         {/* Seasons Section */}
         {seasons.length > 0 && (
-          <div className="mb-12">
+          <div className="mb-12 backdrop-blur-sm rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Seasons</h2>
             <div className="flex gap-2 mb-6 flex-wrap">
               {seasons.map((season, index) => (
@@ -286,7 +303,7 @@ export default function TVShowPage() {
 
             {/* Selected Season Episodes */}
             {currentSeason && (
-              <div>
+              <div className="backdrop-blur-sm rounded-lg">
                 <h3 className="text-xl font-semibold mb-4">
                   Season {currentSeason.season_number} - {currentSeason.name}
                 </h3>
@@ -300,13 +317,24 @@ export default function TVShowPage() {
                       className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                       onClick={() => handleEpisodeClick(episode)}
                     >
-                      <Image
-                        src={`https://image.tmdb.org/t/p/w500${episode.still_path}`}
-                        alt={episode.name}
-                        width={200}
-                        height={120}
-                        className="object-cover w-full h-[120px]"
-                      />
+                      {episode.still_path ? (
+                        <Image
+                          src={`https://image.tmdb.org/t/p/w500${episode.still_path}`}
+                          alt={episode.name}
+                          width={200}
+                          height={120}
+                          className="object-cover w-full h-[120px]"
+                        />
+                      ) : (
+                        <div className="w-full h-[120px] bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
+                          <div className="text-center p-4">
+                            <div className="text-2xl mb-2">🎬</div>
+                            <div className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                              Episode {episode.episode_number}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       <div className="p-3">
                         <h3 className="text-sm font-semibold mb-2 line-clamp-2">
                           {episode.name}
@@ -334,7 +362,7 @@ export default function TVShowPage() {
               {filterAndLimitMedia(relatedShows, 12).map((show) => (
                 <div
                   key={show.id}
-                  className="cursor-pointer group"
+                  className="cursor-pointer group backdrop-blur-lg rounded-lg"
                   onClick={() => handleClick(show.id)}
                 >
                   <div className="relative overflow-hidden rounded-lg">
@@ -355,7 +383,7 @@ export default function TVShowPage() {
                       </div>
                     )}
                   </div>
-                  <div className="mt-2 text-sm font-medium text-center line-clamp-2">
+                  <div className="mt-2 text-sm font-medium text-center line-clamp-2 text-black">
                     {show.name}
                   </div>
                   {show.first_air_date && (

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import SearchModal from "./searchModal";
 import { useRouter } from "next/navigation";
-import { Search, Home, Bookmark, User } from "lucide-react";
+import { Search, Home, Bookmark, User, Film } from "lucide-react";
 
 export default function Header() {
   const {
@@ -22,7 +22,6 @@ export default function Header() {
   } = useAppStore();
 
   const inputRefLocal = useRef<HTMLInputElement>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   useEffect(() => {
@@ -59,13 +58,6 @@ export default function Header() {
     }, 100);
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <>
@@ -75,7 +67,7 @@ export default function Header() {
           <div className="flex items-center justify-between py-4">
             <Link href="/" className="flex items-center gap-2">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
-                The Movie Tracker
+                The <br /> Movie <br /> Tracker
               </h1>
             </Link>
 
@@ -158,13 +150,16 @@ export default function Header() {
       </header>
 
       {/* Mobile Header - Simplified */}
-      <header className="md:hidden w-full mb-4 sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="px-3 py-3">
-          <div className="flex items-center justify-center">
+      <header className="md:hidden w-full mb-4 sticky top-0 z-40 bg-background/80 backdrop-blur-sm supports-[backdrop-filter]:bg-background/10">
+        <div className="px-4 py-2">
+          <div className="flex items-center justify-start">
             {/* Logo - Centered */}
-            <Link href="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
-                TMT
+            <Link href="/" className="flex items-center gap-2" >
+              <h1 className="text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
+              <Film className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
+                TheMovieTracker
+              </span>
               </h1>
             </Link>
           </div>
@@ -172,36 +167,36 @@ export default function Header() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-border mobile-nav">
-        <div className="flex items-center justify-around py-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/10 rounded-full m-2 backdrop-blur-sm dark:bg-dark-background/10 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="flex items-center justify-around">
           <Link
             href="/"
-            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-800 dark:text-white"
           >
-            <Home className="w-5 h-5" />
-            <span className="text-xs">Home</span>
+            <Home className="w-5 h-5 text-gray-800 dark:text-white" />
+            <span className="text-xs font-medium text-gray-800 dark:text-white">Home</span>
           </Link>
 
           <SignedIn>
             <Link
               href="/bookmarks"
-              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-800 dark:text-white"
             >
-              <Bookmark className="w-5 h-5" />
-              <span className="text-xs">Bookmarks</span>
+              <Bookmark className="w-5 h-5 text-gray-800 dark:text-white" />
+              <span className="text-xs font-medium text-gray-800 dark:text-white">Bookmarks</span>
             </Link>
           </SignedIn>
 
           <button
             onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-800 dark:text-white"
           >
-            <Search className="w-5 h-5" />
-            <span className="text-xs">Search</span>
+            <Search className="w-5 h-5 text-gray-800 dark:text-white" />
+            <span className="text-xs font-medium text-gray-800 dark:text-white">Search</span>
           </button>
 
           <SignedIn>
-            <div className="flex flex-col items-center gap-1 p-2">
+            <div className="flex flex-col items-center gap-1 p-2 text-gray-800 dark:text-white">
               <UserButton
                 appearance={{ 
                   elements: { 
@@ -210,24 +205,24 @@ export default function Header() {
                   } 
                 }}
               />
-              <span className="text-xs">Profile</span>
+              <span className="text-xs font-medium text-gray-800 dark:text-white">Profile</span>
             </div>
           </SignedIn>
 
           <SignedOut>
             <Link
               href="/login"
-              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-800 dark:text-white"
             >
-              <User className="w-5 h-5" />
-              <span className="text-xs">Sign In</span>
+              <User className="w-5 h-5 text-gray-800 dark:text-white" />
+              <span className="text-xs font-medium text-gray-800 dark:text-white">Sign In</span>
             </Link>
           </SignedOut>
         </div>
 
         {/* Expandable Search Bar - Below bottom navigation */}
         {isSearchExpanded && (
-          <div className="px-3 py-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-3 py-3 border-t border-gray-200 dark:border-gray-700 backdrop-blur-sm">
             <form className="relative">
               <input
                 ref={inputRefLocal}
@@ -237,20 +232,20 @@ export default function Header() {
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                className="w-full px-4 py-3 bg-light-background dark:bg-dark-background border border-gray-600 rounded-lg text-light-foreground dark:text-dark-foreground placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-input-border dark:focus:ring-dark-accent"
+                className="w-full px-4 py-3 bg-white/10 dark:bg-gray-700/10 border border-gray-300 dark:border-gray-600 rounded-full text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               />
               {search && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 >
                   ✕
                 </button>
               )}
               {isSearching && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-4 h-4 border-2 border-gray-400 border-t-light-input-border rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin"></div>
                 </div>
               )}
             </form>
